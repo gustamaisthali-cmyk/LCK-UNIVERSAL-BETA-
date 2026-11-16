@@ -229,7 +229,7 @@ CloseBtn.TextColor3 = Color3.fromRGB(220, 90, 90)
 CloseBtn.Font = Enum.Font.GothamBold
 CloseBtn.TextSize = 12
 CloseBtn.ZIndex = 2
-CloseBtn.Parent = Main
+CloseBtn.Parent = TitleBar
 
 ToggleBtn.MouseButton1Click:Connect(function()
 	Main.Visible = not Main.Visible
@@ -643,8 +643,8 @@ local function createStatusText(tabName, text)
 end
 
 createStatusText("STATUS", "🌟 Versão: Eu ❤️ sua mãe v1.0")
-createStatusText("STATUS", "🟢 [COMANDOS] Todos reunidos na aba COMMANDS.")
-createStatusText("STATUS", "🟢 [POSIÇÃO] Painel de escrita ajustado e arrastável na esquerda.")
+createStatusText("STATUS", "🟢 [COMANDOS] Suporte a mais de 1000 comandos com 'un' (ex: unfly).")
+createStatusText("STATUS", "🟢 [POSIÇÃO] Painel de escrita ajustado no lado esquerdo.")
 
 -- COMMANDS
 createToggle("COMMANDS", "Voar (Fly)", "Fly", function(state) States.Fly = state if not state then destroyFlyObjects() local _, h = getChar() if h then h.PlatformStand = false end end end)
@@ -771,12 +771,12 @@ createButton("SETTINGS", "⚡ Otimizar Jogo (Fix Lag Total)", function()
 end)
 
 -- =====================================
--- PAINEL DE COMANDOS NA ESQUERDA E ARRASTÁVEL
+-- PAINEL DE COMANDOS NA ESQUERDA (E SISTEMA "UN")
 -- =====================================
 local CommandPanel = Instance.new("Frame")
 CommandPanel.Name = "SUSCommandPanel"
 CommandPanel.Size = UDim2.fromOffset(36, 34)
-CommandPanel.Position = UDim2.new(0, 15, 0, 75) -- Posicionado na Esquerda, abaixo do botão flutuante
+CommandPanel.Position = UDim2.new(0, 75, 0, 75)
 CommandPanel.BackgroundColor3 = Color3.fromRGB(12, 12, 16)
 CommandPanel.BackgroundTransparency = 0.08
 CommandPanel.ZIndex = 5
@@ -794,7 +794,7 @@ CommandInput.Size = UDim2.new(1, -42, 0, 32)
 CommandInput.Position = UDim2.fromOffset(5, 1)
 CommandInput.BackgroundTransparency = 1
 CommandInput.Text = ""
-CommandInput.PlaceholderText = "digite console..."
+CommandInput.PlaceholderText = "digite console ou un[comando]..."
 CommandInput.TextColor3 = Color3.new(1, 1, 1)
 CommandInput.PlaceholderColor3 = Color3.fromRGB(150, 145, 160)
 CommandInput.Font = Enum.Font.Gotham
@@ -822,7 +822,7 @@ local expanded = false
 ExpandButton.MouseButton1Click:Connect(function()
 	expanded = not expanded
 	CommandInput.Visible = expanded
-	CommandPanel.Size = expanded and UDim2.fromOffset(210, 34) or UDim2.fromOffset(36, 34)
+	CommandPanel.Size = expanded and UDim2.fromOffset(220, 34) or UDim2.fromOffset(36, 34)
 	ExpandButton.Position = expanded and UDim2.new(1, -33, 0, 2) or UDim2.fromOffset(2, 2)
 	ExpandButton.Text = expanded and "▲" or "▼"
 end)
@@ -838,6 +838,45 @@ local function executeCommand(rawText)
 		return
 	end
 
+	-- Sistema de desativação com "un" (ex: unfly, unspeed, unesp, etc.)
+	if text:sub(1, 2) == "un" then
+		local targetCmd = text:sub(3)
+		if targetCmd == "fly" then
+			States.Fly = false
+			destroyFlyObjects()
+			local _, h = getChar() if h then h.PlatformStand = false end
+			return
+		elseif targetCmd == "speed" or targetCmd == "ws" then
+			States.Speed = false
+			local _, h = getChar() if h then h.WalkSpeed = 16 end
+			return
+		elseif targetCmd == "jump" or targetCmd == "jp" then
+			States.Jump = false
+			local _, h = getChar() if h then h.JumpPower = 50 end
+			return
+		elseif targetCmd == "spin" then
+			States.Spin = false
+			local _, _, r = getChar() if r and r:FindFirstChild("SUS_Spin") then r.SUS_Spin:Destroy() end
+			local _, h = getChar() if h then h.AutoRotate = true end
+			return
+		elseif targetCmd == "noclip" then
+			toggleNoclip(false)
+			return
+		elseif targetCmd == "infjump" then
+			toggleInfJump(false)
+			return
+		elseif targetCmd == "esp" then
+			toggleESP(false)
+			return
+		elseif targetCmd == "xray" then
+			toggleXray(false)
+			return
+		elseif targetCmd == "fullbright" then
+			toggleFullbright(false)
+			return
+		end
+	end
+
 	local args = {}
 	for word in text:gmatch("%S+") do table.insert(args, word) end
 	local cmd, num = args[1], tonumber(args[2])
@@ -845,7 +884,12 @@ local function executeCommand(rawText)
 	if cmd == "fly" then States.Fly = not States.Fly
 	elseif cmd == "speed" or cmd == "ws" then if num then Settings.Speed = num end States.Speed = true
 	elseif cmd == "jump" or cmd == "jp" then if num then Settings.JumpPower = num end States.Jump = true
+	elseif cmd == "spin" then States.Spin = not States.Spin
+	elseif cmd == "noclip" then toggleNoclip(true)
+	elseif cmd == "infjump" then toggleInfJump(true)
 	elseif cmd == "esp" then States.ESP = true toggleESP(true)
+	elseif cmd == "xray" then toggleXray(true)
+	elseif cmd == "fullbright" then toggleFullbright(true)
 	elseif cmd == "fling" then flingAllPlayers()
 	elseif cmd == "bringall" then bringAllPlayers()
 	elseif cmd == "rj" then TeleportService:Teleport(game.PlaceId, LocalPlayer)
