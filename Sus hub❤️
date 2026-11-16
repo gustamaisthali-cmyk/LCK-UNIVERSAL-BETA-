@@ -229,7 +229,7 @@ CloseBtn.TextColor3 = Color3.fromRGB(220, 90, 90)
 CloseBtn.Font = Enum.Font.GothamBold
 CloseBtn.TextSize = 12
 CloseBtn.ZIndex = 2
-CloseBtn.Parent = TitleBar
+CloseBtn.Parent = Main
 
 ToggleBtn.MouseButton1Click:Connect(function()
 	Main.Visible = not Main.Visible
@@ -312,7 +312,7 @@ RunService.RenderStepped:Connect(function()
 end)
 
 -- =====================================
--- SISTEMA DE ABAS (SEM MOVEMENT E VISUAL)
+-- SISTEMA DE ABAS
 -- =====================================
 local TabBar = Instance.new("ScrollingFrame")
 TabBar.Size = UDim2.new(1, -10, 0, 28)
@@ -625,7 +625,7 @@ local function toggleFullbright(active)
 end
 
 -- =====================================
--- POPULANDO AS ABAS (COMANDOS COMPLETOS NA ABA COMMANDS)
+-- POPULANDO AS ABAS
 -- =====================================
 local function createStatusText(tabName, text)
 	local parentPage = pages[tabName]
@@ -644,9 +644,9 @@ end
 
 createStatusText("STATUS", "🌟 Versão: Eu ❤️ sua mãe v1.0")
 createStatusText("STATUS", "🟢 [COMANDOS] Todos reunidos na aba COMMANDS.")
-createStatusText("STATUS", "🟢 [POSIÇÃO] Painel de escrita arrastável na direita.")
+createStatusText("STATUS", "🟢 [POSIÇÃO] Painel de escrita ajustado e arrastável na esquerda.")
 
--- COMMANDS (TODOS OS COMANDOS E FUNÇÕES AQUI)
+-- COMMANDS
 createToggle("COMMANDS", "Voar (Fly)", "Fly", function(state) States.Fly = state if not state then destroyFlyObjects() local _, h = getChar() if h then h.PlatformStand = false end end end)
 createToggle("COMMANDS", "Velocidade (Speed)", "Speed", function(state) States.Speed = state if not state then local _, h = getChar() if h then h.WalkSpeed = 16 end end end)
 createToggle("COMMANDS", "Pulo Aumentado (Jump)", "Jump", function(state) States.Jump = state if not state then local _, h = getChar() if h then h.JumpPower = 50 end end end)
@@ -771,12 +771,12 @@ createButton("SETTINGS", "⚡ Otimizar Jogo (Fix Lag Total)", function()
 end)
 
 -- =====================================
--- PAINEL DE COMANDOS NA DIREITA E ARRASTÁVEL
+-- PAINEL DE COMANDOS NA ESQUERDA E ARRASTÁVEL
 -- =====================================
 local CommandPanel = Instance.new("Frame")
 CommandPanel.Name = "SUSCommandPanel"
 CommandPanel.Size = UDim2.fromOffset(36, 34)
-CommandPanel.Position = UDim2.new(1, -65, 0, 75) -- Na Direita
+CommandPanel.Position = UDim2.new(0, 15, 0, 75) -- Posicionado na Esquerda, abaixo do botão flutuante
 CommandPanel.BackgroundColor3 = Color3.fromRGB(12, 12, 16)
 CommandPanel.BackgroundTransparency = 0.08
 CommandPanel.ZIndex = 5
