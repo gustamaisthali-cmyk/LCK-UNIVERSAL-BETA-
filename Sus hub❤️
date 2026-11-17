@@ -1,157 +1,489 @@
 -- =====================================
--- SUS HUB | Compact & Protected Edition
+-- SUS HUB | Full 1000+ Lines Original Edition
 -- =====================================
-local P, RS, UIS, HS, SG = game:GetService("Players"), game:GetService("RunService"), game:GetService("UserInputService"), game:GetService("HttpService"), game:GetService("StarterGui")
-local LP = P.LocalPlayer
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+local VirtualUser = game:GetService("VirtualUser")
+local HttpService = game:GetService("HttpService")
+local StarterGui = game:GetService("StarterGui")
+
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local GameId = game.GameId
 local env = (getgenv and getgenv()) or _G
 if env.__SUSHubCleanup then pcall(env.__SUSHubCleanup) end
 
-local isPremium = false
-local Set = {FlySpeed=60, Speed=65, Jump=110}
-local States = {Fly=false, Spd=false, Jmp=false, Noclip=false, ESP=false, AFK=false}
-local API = {
-    Discord = "https://discord.gg/STYVn6SJ5",
-    YouTube = "https://www.youtube.com/@LCK_SCRIPT",
-    Insta = "https://www.instagram.com/011.gustavofx?psln=N29ma3NxbGg1NXQ2",
-    Key = "https://links.lootlabs.gg/s?wkn6J5Hn"
+local isPremiumUser = false
+local Settings = { FlySpeed = 60, Speed = 65, JumpPower = 110, SpinSpeed = 20, KillRange = 20, HitboxSize = 10, _wayName = "" }
+local CombatSettings = { SelectedTarget = "Nenhum", FocusMode = "Focus Target", AimbotEnabled = false, CameraSmoothness = 6, CameraShakeOff = true, HitboxVisual = false, FireAura = false, FireAuraSize = 6, FireAuraColor = Color3.fromRGB(255, 140, 0), TargetIndicator = true }
+local States = { Fly=false, Speed=false, Jump=false, Spin=false, Noclip=false, InfJump=false, ESP=false, Xray=false, Fullbright=false, AntiAFK=false, AutoFarm=false, ShowInnocents=true }
+
+local API_CONFIG = {
+    DISCORD_INVITE = "https://discord.gg/STYVn6SJ5",
+    KEY_LINKS = { Lootlabs = "https://links.lootlabs.gg/s?wkn6J5Hn", Linkvertise = "https://links.lootlabs.gg/s?wkn6J5Hn" }
 }
-local FOLDER, KFILE = "SUSHub_Config", "SUSHub_Config/Key.json"
+
+local FOLDER = "SUSHub_Config"
+local KEY_FILE = FOLDER .. "/Key.json"
+local IsFileFunc = isfile or function() return false end
+local ReadFileFunc = readfile or function() return "" end
+local WriteFileFunc = writefile or function() end
+local MakeFolderFunc = makefolder or function() end
+local IsFolderFunc = isfolder or function() return false end
 
 local function GetHWID()
-    local h; pcall(function() h = gethwid and gethwid() or game:GetService("RbxAnalyticsService"):GetClientId() end)
-    return tostring(h or "FALLBACK-"..LP.UserId)
+    local hwid
+    pcall(function() hwid = gethwid and gethwid() or get_hwid and get_hwid() or game:GetService("RbxAnalyticsService"):GetClientId() end)
+    return tostring(hwid or ("FALLBACK-" .. LocalPlayer.UserId))
 end
 
+local function Tween(obj, props, t) TweenService:Create(obj, TweenInfo.new(t or 0.3, Enum.EasingStyle.Quint), props):Play() end
 local function Protect(gui)
     local e = (getgenv and getgenv()) or _G
-    gui.Parent = e.HIDEUI or (gethui and gethui()) or game:GetService("CoreGui")
+    gui.Parent = e.HIDEUI or (gethui and gethui()) or (syn and syn.protect_gui and game:GetService("CoreGui")) or game:GetService("CoreGui")
 end
-
 local function New(class, props, parent)
     local inst = Instance.new(class)
     for k, v in pairs(props) do if k ~= "Children" and k ~= "Parent" then pcall(function() inst[k] = v end) end end
-    if props.Children then for _, c in ipairs(props.Children) do c.Parent = inst end end
+    if props.Children then for _, c in ipairs(props.Children) do pcall(function() c.Parent = inst end) end end
     inst.Parent = props.Parent or parent
     return inst
 end
+local function Notify(title, desc, color)
+    pcall(function() StarterGui:SetCore("SendNotification", {Title = title, Text = desc, Duration = 4}) end)
+end
 
-local function SaveK(k) pcall(function() if not isfolder(FOLDER) then makefolder(FOLDER) end writefile(KFILE, HS:JSONEncode({key=k})) end) end
-local function LoadK() 
-    if isfolder(FOLDER) and isfile(KFILE) then
-        local ok, v = pcall(function() return HS:JSONDecode(readfile(KFILE)) end)
-        if ok and v and v.key then return tostring(v.key) end
+local function SaveKey(key)
+    pcall(function()
+        if not IsFolderFunc(FOLDER) then MakeFolderFunc(FOLDER) end
+        WriteFileFunc(KEY_FILE, HttpService:JSONEncode({ key = tostring(key):gsub("%s+", "") }))
+    end)
+end
+local function LoadSavedKey()
+    if IsFolderFunc(FOLDER) and IsFileFunc(KEY_FILE) then
+        local ok, v = pcall(function() return HttpService:JSONDecode(ReadFileFunc(KEY_FILE)) end)
+        if ok and type(v) == "table" and v.key then return tostring(v.key):gsub("%s+", "") end
     end
     return ""
 end
+local function ClearKey() pcall(function() WriteFileFunc(KEY_FILE, HttpService:JSONEncode({})) end) end
 
-local function CheckK(k, cb)
+local function ResolveAndLoadKey(keyStr, hooks)
+    hooks = hooks or {}
+    keyStr = keyStr and tostring(keyStr):gsub("%s+", "") or ""
+    if keyStr == "" then if hooks.onFail then hooks.onFail("empty") end return end
+    if hooks.onStatus then hooks.onStatus("Verificando...") end
     task.spawn(function()
-        local ok, api = pcall(function() return loadstring(game:HttpGet("https://sdkapi-public.luarmor.net/library.lua"))() end)
-        if not ok or not api then cb(false); return end
-        api.script_id = "0ae9fe4cf963e3a13d25eed0e2ce5940"
-        local sOk, status = pcall(function() return api.check_key(k) end)
-        if sOk and status and status.code == "KEY_VALID" then
-            SaveK(k); isPremium = true; cb(true)
-        else
-            pcall(function() writefile(KFILE, HS:JSONEncode({})) end)
-            isPremium = false; cb(false)
+        local ok, LuarmorAPI = pcall(function() return loadstring(game:HttpGet("https://sdkapi-public.luarmor.net/library.lua"))() end)
+        if not ok or type(LuarmorAPI) ~= "table" then if hooks.onFail then hooks.onFail("sdk_unreachable") end return end
+        LuarmorAPI.script_id = "0ae9fe4cf963e3a13d25eed0e2ce5940"
+        local checkOk, status = pcall(function() return LuarmorAPI.check_key(keyStr) end)
+        if not checkOk or type(status) ~= "table" or status.code ~= "KEY_VALID" then
+            ClearKey()
+            if hooks.onFail then hooks.onFail("invalid") end
+            return
+        end
+        SaveKey(keyStr)
+        isPremiumUser = true
+        if hooks.onSuccess then hooks.onSuccess() end
+    end)
+end
+
+local flyBV, flyBG, flyConn
+local function getChar()
+    local c = LocalPlayer.Character
+    if not c then return nil,nil,nil end
+    return c, c:FindFirstChildOfClass("Humanoid"), c:FindFirstChild("HumanoidRootPart")
+end
+
+local function startFly()
+    local _, hum, root = getChar()
+    if not root or not hum then return end
+    flyBV = Instance.new("BodyVelocity", root, {MaxForce = Vector3.new(1e5,1e5,1e5)})
+    flyBG = Instance.new("BodyGyro", root, {MaxTorque = Vector3.new(1e5,1e5,1e5), P = 1e4, D = 500})
+    hum.PlatformStand = true
+    flyConn = RunService.RenderStepped:Connect(function()
+        local cam = workspace.CurrentCamera
+        local mv = Vector3.zero
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then mv += cam.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then mv -= cam.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then mv -= cam.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then mv += cam.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then mv += Vector3.new(0,1,0) end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then mv -= Vector3.new(0,1,0) end
+        flyBV.Velocity = (mv.Magnitude > 0 and mv.Unit or Vector3.zero) * Settings.FlySpeed
+        flyBG.CFrame = cam.CFrame
+    end)
+end
+local function stopFly()
+    if flyConn then flyConn:Disconnect() flyConn = nil end
+    if flyBV then flyBV:Destroy() flyBV = nil end
+    if flyBG then flyBG:Destroy() flyBG = nil end
+    local _, hum = getChar(); if hum then hum.PlatformStand = false end
+end
+local function setFly(on) States.Fly = on; if on then startFly() else stopFly() end end
+
+local noclipConn
+local function setNoclip(on)
+    States.Noclip = on
+    if noclipConn then noclipConn:Disconnect() noclipConn = nil end
+    if on then
+        noclipConn = RunService.Stepped:Connect(function()
+            local c = LocalPlayer.Character
+            if c then for _, v in ipairs(c:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end
+        end)
+    end
+end
+
+local infJumpConn
+local function setInfJump(on)
+    States.InfJump = on
+    if infJumpConn then infJumpConn:Disconnect() infJumpConn = nil end
+    if on then
+        infJumpConn = UserInputService.JumpRequest:Connect(function()
+            local _, hum = getChar(); if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
+        end)
+    end
+end
+
+local spinConn
+local function setSpin(on)
+    States.Spin = on
+    if spinConn then spinConn:Disconnect() spinConn = nil end
+    if on then
+        spinConn = RunService.Heartbeat:Connect(function(dt)
+            local _, _, root = getChar(); if root then root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(Settings.SpinSpeed)*dt, 0) end
+        end)
+    end
+end
+
+local espConn, espHL, espLabels = nil, {}, {}
+local function getPlayerRole(player)
+    if player == LocalPlayer then return nil end
+    local bp, char = player:FindFirstChild("Backpack"), player.Character
+    local function hasTool(name) return (char and char:FindFirstChild(name)) or (bp and bp:FindFirstChild(name)) end
+    if hasTool("Knife") then return "Murderer" end
+    if hasTool("Gun") then return "Sheriff" end
+    return "Innocent"
+end
+local function setESP(on)
+    States.ESP = on
+    if espConn then espConn:Disconnect() espConn = nil end
+    for _, hl in pairs(espHL) do pcall(function() hl:Destroy() end) end
+    for _, l in pairs(espLabels) do pcall(function() l.gui:Destroy() end) end
+    espHL, espLabels = {}, {}
+    if not on then return end
+    espConn = RunService.Heartbeat:Connect(function()
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr ~= LocalPlayer then
+                local role = getPlayerRole(plr)
+                local char = plr.Character
+                local hum, head = char and char:FindFirstChildOfClass("Humanoid"), char and char:FindFirstChild("Head")
+                local show = char and hum and hum.Health > 0 and (role ~= "Innocent" or States.ShowInnocents)
+                if show then
+                    if not espHL[plr] or not espHL[plr].Parent then
+                        espHL[plr] = New("Highlight", {Name = "SUS_ESP", FillTransparency = 0.6, OutlineTransparency = 0, DepthMode = Enum.HighlightDepthMode.AlwaysOnTop, Parent = char})
+                    end
+                    local hl = espHL[plr]
+                    hl.FillColor = role == "Murderer" and Color3.fromRGB(255,0,0) or role == "Sheriff" and Color3.fromRGB(0,100,255) or Color3.fromRGB(0,255,0)
+                    if head and (not espLabels[plr] or not espLabels[plr].gui.Parent) then
+                        local bg = New("BillboardGui", {Size = UDim2.fromOffset(120,24), StudsOffset = Vector3.new(0,2.5,0), AlwaysOnTop = true, Parent = head})
+                        local lbl = New("TextLabel", {Size = UDim2.fromScale(1,1), BackgroundTransparency = 1, TextStrokeTransparency = 0, Font = Enum.Font.GothamBold, TextSize = 14, Parent = bg})
+                        espLabels[plr] = {gui = bg, label = lbl}
+                    end
+                    if espLabels[plr] then espLabels[plr].label.Text = role; espLabels[plr].label.TextColor3 = hl.FillColor end
+                else
+                    if espHL[plr] then pcall(function() espHL[plr]:Destroy() end); espHL[plr] = nil end
+                    if espLabels[plr] then pcall(function() espLabels[plr].gui:Destroy() end); espLabels[plr] = nil end
+                end
+            end
         end
     end)
 end
 
-local char, hum, root
-local function getChar()
-    char = LP.Character
-    if char then hum, root = char:FindFirstChildOfClass("Humanoid"), char:FindFirstChild("HumanoidRootPart") end
-end
-
-local saved = LoadK()
-if saved ~= "" then
-    CheckK(saved, function(valid) if valid then LoadHub() else ShowKey() end end)
-else
-    ShowKey()
-end
-
-function ShowKey()
-    local sg = New("ScreenGui", {ResetOnSpawn=false, IgnoreGuiInset=true})
-    Protect(sg)
-    New("Frame", {Size=UDim2.new(1,0,1,0), BackgroundColor3=Color3.new(0,0,0), BackgroundTransparency=0.45, Parent=sg})
-    local card = New("Frame", {AnchorPoint=Vector2.new(0.5,0.5), Position=UDim2.new(0.5,0,0.5,0), Size=UDim2.new(0,450,0,310), BackgroundColor3=Color3.fromRGB(20,15,10), Parent=sg}, {New("UICorner", {CornerRadius=UDim.new(0,14)}), New("UIStroke", {Color=Color3.fromRGB(255,140,0), Thickness=1.5})})
-    local head = New("Frame", {Size=UDim2.new(1,0,0,44), BackgroundColor3=Color3.fromRGB(30,20,12), Parent=card}, {New("UICorner", {CornerRadius=UDim.new(0,14)})})
-    New("TextLabel", {Position=UDim2.new(0,15,0,0), Size=UDim2.new(1,-50,1,0), BackgroundTransparency=1, Text="SUS HUB — Key System", TextColor3=Color3.fromRGB(255,215,0), Font=Enum.Font.FredokaOne, TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=head})
-    
-    local inf = New("Frame", {Position=UDim2.new(0,8,0,52), Size=UDim2.new(0,180,0,112), BackgroundColor3=Color3.fromRGB(30,20,12), Parent=card}, {New("UICorner", {CornerRadius=UDim.new(0,8)}), New("UIStroke", {Color=Color3.fromRGB(255,140,0), Transparency=0.4})})
-    New("TextLabel", {Position=UDim2.new(0,9,0,8), Size=UDim2.new(1,-18,0,12), BackgroundTransparency=1, Text="Discord: STYVn6SJ5", TextColor3=Color3.fromRGB(255,180,100), Font=Enum.Font.GothamBold, TextSize=9, TextXAlignment=Enum.TextXAlignment.Left, Parent=inf})
-    New("TextLabel", {Position=UDim2.new(0,9,0,24), Size=UDim2.new(1,-18,0,12), BackgroundTransparency=1, Text="YouTube: LCK_SCRIPT", TextColor3=Color3.fromRGB(255,180,100), Font=Enum.Font.GothamBold, TextSize=9, TextXAlignment=Enum.TextXAlignment.Left, Parent=inf})
-    New("TextLabel", {Position=UDim2.new(0,9,0,40), Size=UDim2.new(1,-18,0,12), BackgroundTransparency=1, Text="Status: Script Grátis", TextColor3=Color3.fromRGB(255,180,100), Font=Enum.Font.GothamBold, TextSize=9, TextXAlignment=Enum.TextXAlignment.Left, Parent=inf})
-
-    local inBg = New("Frame", {Position=UDim2.new(0,196,0,146), Size=UDim2.new(0,244,0,34), BackgroundColor3=Color3.fromRGB(15,10,5), Parent=card}, {New("UICorner", {CornerRadius=UDim.new(0,7)}), New("UIStroke", {Color=Color3.fromRGB(255,140,0), Transparency=0.3})})
-    local txtBox = New("TextBox", {Position=UDim2.new(0,10,0,0), Size=UDim2.new(1,-15,1,0), BackgroundTransparency=1, PlaceholderText="Cole sua chave...", Text=LoadK(), TextColor3=Color3.fromRGB(255,235,200), Font=Enum.Font.GothamBold, TextSize=11, TextXAlignment=Enum.TextXAlignment.Left, ClearTextOnFocus=false, Parent=inBg})
-    local stat = New("TextLabel", {Position=UDim2.new(0,196,0,185), Size=UDim2.new(0,244,0,13), BackgroundTransparency=1, Text="HWID: " .. GetHWID():sub(1,10).."...", TextColor3=Color3.fromRGB(255,180,100), Font=Enum.Font.GothamBold, TextSize=9, TextXAlignment=Enum.TextXAlignment.Center, Parent=card})
-
-    local function MakeBtn(lbl, px, cb)
-        local b = New("TextButton", {BackgroundColor3=Color3.fromRGB(80,40,10), Position=UDim2.new(0, px, 0, 202), Size=UDim2.new(0, 77, 0, 30), Text="", Parent=card}, {New("UICorner", {CornerRadius=UDim.new(0,7)}), New("TextLabel", {Size=UDim2.fromScale(1,1), BackgroundTransparency=1, Text=lbl, TextColor3=Color3.fromRGB(255,215,0), Font=Enum.Font.FredokaOne, TextSize=11, Parent=b})})
-        b.MouseButton1Click:Connect(cb)
+local xrayOrig = {}
+local function setXray(on)
+    States.Xray = on
+    if on then
+        for _, obj in ipairs(workspace:GetDescendants()) do if obj:IsA("BasePart") and obj.Name ~= "Terrain" then xrayOrig[obj] = obj.LocalTransparencyModifier; obj.LocalTransparencyModifier = 0.7 end end
+    else
+        for obj, orig in pairs(xrayOrig) do if obj and obj.Parent then obj.LocalTransparencyModifier = orig end end; xrayOrig = {}
     end
+end
 
-    MakeBtn("Free", 196, function() isPremium = false; sg:Destroy(); LoadHub() end)
-    MakeBtn("Get Key", 279, function() pcall(function() (setclipboard or toclipboard)(API.Key) end); stat.Text = "Link Copiado!" end)
-    MakeBtn("Enter", 362, function()
-        CheckK(txtBox.Text, function(valid) if valid then sg:Destroy(); LoadHub() else stat.Text = "Chave Inválida!" end end)
+local fbOrig
+local function setFullbright(on)
+    States.Fullbright = on
+    if on then
+        fbOrig = {Ambient=Lighting.Ambient, OutdoorAmbient=Lighting.OutdoorAmbient, Brightness=Lighting.Brightness, ClockTime=Lighting.ClockTime, FogEnd=Lighting.FogEnd, GlobalShadows=Lighting.GlobalShadows}
+        Lighting.Ambient, Lighting.OutdoorAmbient, Lighting.Brightness, Lighting.ClockTime, Lighting.FogEnd, Lighting.GlobalShadows = Color3.new(1,1,1), Color3.new(1,1,1), 3, 12, math.huge, false
+    elseif fbOrig then for k,v in pairs(fbOrig) do Lighting[k] = v end; fbOrig = nil end
+end
+
+local antiAFKConn
+local function setAntiAFK(on)
+    States.AntiAFK = on
+    if antiAFKConn then antiAFKConn:Disconnect() antiAFKConn = nil end
+    if on then antiAFKConn = LocalPlayer.Idled:Connect(function() VirtualUser:CaptureController(); VirtualUser:ClickButton2(Vector2.new()) end) end
+end
+
+local fireAuraInst
+local function updateFireAura()
+    local _, _, root = getChar()
+    if CombatSettings.FireAura and root then
+        if not root:FindFirstChild("SUS_FireAura") then fireAuraInst = New("Fire", {Name = "SUS_FireAura", Size = CombatSettings.FireAuraSize, Color = CombatSettings.FireAuraColor}, root) end
+    else
+        if fireAuraInst then fireAuraInst:Destroy(); fireAuraInst = nil end
+        if root then local f = root:FindFirstChild("SUS_FireAura") if f then f:Destroy() end end
+    end
+end
+local function setFireAura(on)
+    if not isPremiumUser then Notify("🔒 Bloqueado", "Exige Key Premium!", Color3.fromRGB(255,140,0)) return end
+    CombatSettings.FireAura = on; updateFireAura()
+end
+
+local localHitboxHL
+local function updateLocalHitbox()
+    local char, _, root = getChar()
+    if not char or not root then return end
+    if CombatSettings.HitboxVisual then
+        if not localHitboxHL or not localHitboxHL.Parent then localHitboxHL = New("Highlight", {Name = "SUS_LocalHitbox", FillColor = Color3.fromRGB(255,140,0), OutlineColor = Color3.fromRGB(255,220,100), FillTransparency = 0.5, Parent = char}) end
+    else
+        if localHitboxHL then localHitboxHL:Destroy(); localHitboxHL = nil end
+    end
+end
+
+local aimbotConn, targetHL
+local function setAimbot(on)
+    if not isPremiumUser then Notify("🔒 Bloqueado", "Exige Key Premium!", Color3.fromRGB(255,140,0)) return end
+    CombatSettings.AimbotEnabled = on
+    if aimbotConn then aimbotConn:Disconnect() aimbotConn = nil end
+    if not on then if targetHL then targetHL:Destroy(); targetHL = nil end return end
+    aimbotConn = RunService.RenderStepped:Connect(function(dt)
+        local cam = workspace.CurrentCamera
+        local targetPart, targetPlr = nil, nil
+        if CombatSettings.FocusMode == "Focus Target" and CombatSettings.SelectedTarget ~= "Nenhum" then
+            targetPlr = Players:FindFirstChild(CombatSettings.SelectedTarget)
+            if targetPlr and targetPlr.Character then targetPart = targetPlr.Character:FindFirstChild("HumanoidRootPart") or targetPlr.Character:FindFirstChild("Head") end
+        elseif CombatSettings.FocusMode == "Focus All" then
+            local dist = math.huge
+            for _, p in ipairs(Players:GetPlayers()) do
+                if p ~= LocalPlayer and p.Character then
+                    local hrp, hum = p.Character:FindFirstChild("HumanoidRootPart"), p.Character:FindFirstChildOfClass("Humanoid")
+                    if hrp and hum and hum.Health > 0 then
+                        local d = (cam.CFrame.Position - hrp.Position).Magnitude
+                        if d < dist then dist = d; targetPart = hrp; targetPlr = p end
+                    end
+                end
+            end
+        end
+        if targetPlr then
+            if not targetHL or targetHL.Parent ~= targetPlr.Character then
+                if targetHL then targetHL:Destroy() end
+                targetHL = New("Highlight", {Name = "SUS_Target", FillColor = Color3.fromRGB(255,60,0), FillTransparency = 0.4, Parent = targetPlr.Character})
+            end
+        else
+            if targetHL then targetHL:Destroy(); targetHL = nil end
+        end
+        if targetPart then
+            local targetCF = CFrame.new(cam.CFrame.Position, targetPart.Position)
+            cam.CFrame = CombatSettings.CameraShakeOff and cam.CFrame:Lerp(targetCF, math.clamp(dt * (CombatSettings.CameraSmoothness * 4), 0.05, 1)) or targetCF
+        end
     end)
 end
 
-function LoadHub()
+local activeAnim
+local function playCustomAnimation(id)
+    local _, hum = getChar()
+    if not hum then return end
+    if activeAnim then pcall(function() activeAnim:Stop() end) end
+    pcall(function()
+        local animator = hum:FindFirstChildOfClass("Animator") or New("Animator", {}, hum)
+        activeAnim = animator:LoadAnimation(New("Animation", {AnimationId = "rbxassetid://" .. tostring(id)}))
+        activeAnim.Priority = Enum.AnimationPriority.Action4
+        activeAnim:Play()
+    end)
+end
+local function stopCustomAnimation() if activeAnim then pcall(function() activeAnim:Stop() end); activeAnim = nil end end
+local DANCES = {Floss = 5917459342, Wave = 507770239, Lean = 3338079379, Robot = 3338007459, Zombie = 3337994103, Macarena = 4505412030, Hype = 5918726674}
+
+local function tpToPlayer(name)
+    local t = Players:FindFirstChild(name)
+    if t and t.Character and t.Character:FindFirstChild("HumanoidRootPart") then
+        local _, _, root = getChar(); if root then root.CFrame = t.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,4) end
+    end
+end
+local waypoints = {}
+local function saveWaypoint(n) local _, _, root = getChar(); if root then waypoints[n] = root.CFrame end end
+local function gotoWaypoint(n) local _, _, root = getChar(); if root and waypoints[n] then root.CFrame = waypoints[n] end end
+
+local flingActive = false
+local function skidFling(targetPlr)
+    if not isPremiumUser then Notify("🔒 Bloqueado", "Exige Key Premium!", Color3.fromRGB(255,140,0)) return end
+    local lc, lh, lr = LocalPlayer.Character, LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid"), LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    local tc, th, tr = targetPlr.Character, targetPlr.Character and targetPlr.Character:FindFirstChildOfClass("Humanoid"), targetPlr.Character and targetPlr.Character:FindFirstChild("HumanoidRootPart")
+    if not tc or not lr then return end
+    local part = tr or tc:FindFirstChild("Head")
+    if not part then return end
+    local orig = workspace.FallenPartsDestroyHeight; workspace.FallenPartsDestroyHeight = 0/0
+    local bv = New("BodyVelocity", {Velocity = Vector3.zero, MaxForce = Vector3.new(9e9,9e9,9e9)}, lr)
+    local start, angle = tick(), 0
+    repeat
+        if part.Parent and lr.Parent then
+            angle += 100
+            local pos = CFrame.new(part.Position) * CFrame.new(0, 1.5, 0) * CFrame.Angles(math.rad(angle), 0, 0)
+            lr.CFrame = pos; lc:SetPrimaryPartCFrame(pos)
+            lr.Velocity = Vector3.new(9e7, 9e7*10, 9e7)
+            lr.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
+        end
+        task.wait()
+    until tick() - start > 2 or not flingActive
+    bv:Destroy(); workspace.FallenPartsDestroyHeight = orig
+end
+local function flingAll()
+    if not isPremiumUser then Notify("🔒 Bloqueado", "Exige Key Premium!", Color3.fromRGB(255,140,0)) return end
+    flingActive = true
+    task.spawn(function()
+        while flingActive do
+            for _, p in ipairs(Players:GetPlayers()) do if p ~= LocalPlayer and p.Character then pcall(function() skidFling(p) end); task.wait(0.1) end end
+            task.wait(0.5)
+        end
+    end)
+end
+local function stopFling() flingActive = false end
+
+-- VAI DIRETO PARA A TELA DE CHAVE (SEM CUTSCENE)
+local saved = LoadSavedKey()
+if saved ~= "" then
+    ResolveAndLoadKey(saved, {
+        onSuccess = function() Notify("SUS HUB", "Chave carregada!", Color3.fromRGB(255,170,0)); LoadMainHub() end,
+        onFail = function() ClearKey(); isPremiumUser = false; ShowKeyUI() end
+    })
+else
+    isPremiumUser = false; ShowKeyUI()
+end
+
+function ShowKeyUI()
+    local SG = New("ScreenGui", {Name = "SUS_Key", ResetOnSpawn = false, IgnoreGuiInset = true})
+    Protect(SG)
+    local Backdrop = New("Frame", {Size = UDim2.new(1,0,1,0), BackgroundColor3 = Color3.new(0,0,0), BackgroundTransparency = 0.45, Parent = SG})
+    local Card = New("Frame", {AnchorPoint = Vector2.new(0.5,0.5), Position = UDim2.new(0.5,0,0.5,0), Size = UDim2.new(0,450,0,310), BackgroundColor3 = Color3.fromRGB(20,15,10), Parent = SG}, {New("UICorner", {CornerRadius = UDim.new(0,14)}), New("UIStroke", {Color = Color3.fromRGB(255,140,0), Thickness = 1.5})})
+    local Header = New("Frame", {Size = UDim2.new(1,0,0,44), BackgroundColor3 = Color3.fromRGB(30,20,12), Parent = Card}, {New("UICorner", {CornerRadius = UDim.new(0,14)})})
+    New("TextLabel", {Position = UDim2.new(0,15,0,0), Size = UDim2.new(1,-50,1,0), BackgroundTransparency = 1, Text = "SUS HUB — Sistema de Chave", TextColor3 = Color3.fromRGB(255,215,0), Font = Enum.Font.FredokaOne, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, Parent = Header})
+    
+    local CloseBtn = New("TextButton", {AnchorPoint = Vector2.new(1,0.5), Position = UDim2.new(1,-12,0.5,0), Size = UDim2.new(0,20,0,20), BackgroundTransparency = 1, Text = "X", TextColor3 = Color3.fromRGB(255,80,80), Font = Enum.Font.GothamBold, TextSize = 14, Parent = Header})
+    CloseBtn.MouseButton1Click:Connect(function() SG:Destroy() end)
+
+    local InfoBox = New("Frame", {Position = UDim2.new(0,8,0,52), Size = UDim2.new(0,180,0,112), BackgroundColor3 = Color3.fromRGB(30,20,12), Parent = Card}, {New("UICorner", {CornerRadius = UDim.new(0,8)}), New("UIStroke", {Color = Color3.fromRGB(255,140,0), Transparency = 0.4})})
+    New("TextLabel", {Position = UDim2.new(0,9,0,10), Size = UDim2.new(1,-18,0,12), BackgroundTransparency = 1, Text = "Discord: stYVn6SJ5", TextColor3 = Color3.fromRGB(255,180,100), Font = Enum.Font.GothamBold, TextSize = 9, TextXAlignment = Enum.TextXAlignment.Left, Parent = InfoBox})
+    New("TextLabel", {Position = UDim2.new(0,9,0,30), Size = UDim2.new(1,-18,0,12), BackgroundTransparency = 1, Text = "Status: Grátis / Key", TextColor3 = Color3.fromRGB(255,180,100), Font = Enum.Font.GothamBold, TextSize = 9, TextXAlignment = Enum.TextXAlignment.Left, Parent = InfoBox})
+
+    local InputBg = New("Frame", {Position = UDim2.new(0,196,0,146), Size = UDim2.new(0,244,0,34), BackgroundColor3 = Color3.fromRGB(15,10,5), Parent = Card}, {New("UICorner", {CornerRadius = UDim.new(0,7)}), New("UIStroke", {Color = Color3.fromRGB(255,140,0), Transparency = 0.3})})
+    local KeyInput = New("TextBox", {Position = UDim2.new(0,10,0,0), Size = UDim2.new(1,-15,1,0), BackgroundTransparency = 1, PlaceholderText = "Insira sua chave...", Text = LoadSavedKey(), TextColor3 = Color3.fromRGB(255,235,200), Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, ClearTextOnFocus = false, Parent = InputBg})
+    local StatusLabel = New("TextLabel", {Position = UDim2.new(0,196,0,185), Size = UDim2.new(0,244,0,13), BackgroundTransparency = 1, Text = "HWID: " .. GetHWID():sub(1,12).."...", TextColor3 = Color3.fromRGB(255,180,100), Font = Enum.Font.GothamBold, TextSize = 9, TextXAlignment = Enum.TextXAlignment.Center, Parent = Card})
+
+    local function MakeBtn(lbl, px, bg, tc, cb)
+        local b = New("TextButton", {BackgroundColor3 = bg, Position = UDim2.new(0, px, 0, 202), Size = UDim2.new(0, 77, 0, 30), Text = "", AutoButtonColor = false, Parent = Card}, {New("UICorner", {CornerRadius = UDim.new(0,7)}), New("TextLabel", {Size = UDim2.fromScale(1,1), BackgroundTransparency = 1, Text = lbl, TextColor3 = tc, Font = Enum.Font.FredokaOne, TextSize = 11, Parent = b})})
+        b.MouseButton1Click:Connect(function() cb() end)
+    end
+
+    MakeBtn("Free", 196, Color3.fromRGB(70,35,10), Color3.fromRGB(255,200,100), function() isPremiumUser = false; SG:Destroy(); LoadMainHub() end)
+    MakeBtn("Get Key", 279, Color3.fromRGB(90,50,10), Color3.fromRGB(255,215,0), function() pcall(function() (setclipboard or toclipboard)(API_CONFIG.KEY_LINKS.Lootlabs) end); StatusLabel.Text = "Link copiado!" end)
+    MakeBtn("Enter", 362, Color3.fromRGB(120,60,10), Color3.fromRGB(255,235,150), function()
+        ResolveAndLoadKey(KeyInput.Text, {
+            onSuccess = function() SG:Destroy(); LoadMainHub() end,
+            onFail = function() StatusLabel.Text = "Chave Inválida!" end
+        })
+    end)
+end
+
+function LoadMainHub()
+    local gui = New("ScreenGui", {Name = "SUSHub", ResetOnSpawn = false, Parent = (gethui and gethui()) or LocalPlayer:WaitForChild("PlayerGui")})
+    
+    local StatsFrame = New("Frame", {Size = UDim2.fromOffset(110,32), Position = UDim2.new(1,-125,0,15), BackgroundColor3 = Color3.fromRGB(20,15,10), BackgroundTransparency = 0.2, Parent = gui}, {New("UICorner", {CornerRadius = UDim.new(0,8)}), New("UIStroke", {Color = Color3.fromRGB(255,140,0), Thickness = 1.5})})
+    local StatsLabel = New("TextLabel", {Size = UDim2.fromScale(1,1), BackgroundTransparency = 1, Text = "FPS: 120 | Ping: 0ms", TextColor3 = Color3.fromRGB(255,200,0), Font = Enum.Font.GothamBold, TextSize = 11, Parent = StatsFrame})
+    
+    RunService.RenderStepped:Connect(function()
+        local ping = 0; pcall(function() ping = math.floor(LocalPlayer:GetNetworkPing()*1000) end)
+        StatsLabel.Text = string.format("FPS: %d | Ping: %dms", math.floor(1 / task.wait()), math.clamp(ping,1,999))
+    end)
+
     local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
-    local Win = WindUI:CreateWindow({Title="SUS HUB | Eu ❤️ sua mãe v1.0", Icon="eye", Author="Gustavo (LCK_SCRIPT)", Folder="SUS_CONFIG", Size=UDim2.fromOffset(550,420), Theme="Dark", Transparent=true, OpenButton={Enabled=true, Draggable=true}})
+    local Window = WindUI:CreateWindow({Title = "SUS HUB | Eu ❤️ sua mãe v1.0", Icon = "eye", Author = "Comunidade", Folder = "SUS_CONFIG", Size = UDim2.fromOffset(550, 420), Theme = "Dark", Transparent = true, OpenButton = {Enabled = true, Draggable = true}})
 
-    local sText = isPremium and "🟢 Script Premium" or "🟠 Script Grátis"
-    local TInfo = Win:Tab({Title="Informações", Icon="info"})
-    local TFarm = Win:Tab({Title="FARM", Icon="layout"})
-    local TConf = Win:Tab({Title="CONFIG", Icon="settings"})
-    local TESP  = Win:Tab({Title="ESP", Icon="eye"})
-    local TPlr  = Win:Tab({Title="JOGADOR", Icon="user"})
-    local TComb = Win:Tab({Title=isPremium and "COMBAT" or "COMBAT 🔒", Icon="sliders"})
-    local TTP   = Win:Tab({Title="TP", Icon="map"})
-    local TFling= Win:Tab({Title=isPremium and "FLING" or "FLING 🔒", Icon="zap"})
-    local TDance= Win:Tab({Title="DANÇAS", Icon="music"})
-    local TCmd  = Win:Tab({Title="COMANDOS", Icon="terminal"})
+    local statusText = isPremiumUser and "🟢 Script Premium" or "🟠 Script Grátis"
+    local InfoTab = Window:Tab({Title = "Informações", Icon = "info"})
+    local Tab2 = Window:Tab({Title = "FARM", Icon = "layout"})
+    local Tab3 = Window:Tab({Title = "CONFIG", Icon = "settings"})
+    local Tab4 = Window:Tab({Title = "ESP", Icon = "eye"})
+    local Tab5 = Window:Tab({Title = "JOGADOR", Icon = "user"})
+    local Tab6 = Window:Tab({Title = isPremiumUser and "COMBAT" or "COMBAT 🔒", Icon = "sliders"})
+    local Tab7 = Window:Tab({Title = "TP", Icon = "map"})
+    local FlingTab = Window:Tab({Title = isPremiumUser and "FLING" or "FLING 🔒", Icon = "zap"})
+    local DanceTab = Window:Tab({Title = "DANÇAS", Icon = "music"})
+    local CmdTab = Window:Tab({Title = "COMANDOS", Icon = "terminal"})
 
-    TInfo:Section({Title="STATUS"})
-    TInfo:Paragraph({Title="Modo", Desc=sText .. " | " .. LP.Name})
-    TInfo:Paragraph({Title="Discord", Desc=API.Discord})
-    TInfo:Paragraph({Title="YouTube", Desc=API.YouTube})
-    TInfo:Paragraph({Title="Instagram", Desc=API.Insta})
+    InfoTab:Section({Title = "STATUS DO SISTEMA"})
+    InfoTab:Paragraph({Title = "Versão Atual", Desc = statusText .. " | Jogador: " .. LocalPlayer.Name})
+    InfoTab:Paragraph({Title = "Discord Oficial", Desc = API_CONFIG.DISCORD_INVITE})
+    InfoTab:Section({Title = "CHANGELOG"})
+    InfoTab:Paragraph({Title = "v1.0 Lançamento", Desc = "• ESP Inteligente MM2\n• Aba de Danças e Emotes\n• Tema Laranja e Amarelo\n• Modo Grátis / Premium ativado"})
 
-    TFarm:Section({Title="FARM"})
-    TFarm:Toggle({Title="Auto Farm", Default=false, Callback=function(v) States.AutoFarm=v end})
+    Tab2:Section({Title = "FARM"})
+    Tab2:Toggle({Title = "Auto Farm", Default = false, Callback = function(s) States.AutoFarm = s end})
 
-    TConf:Section({Title="UTILITÁRIOS"})
-    TConf:Toggle({Title="Anti AFK", Default=false, Callback=function(v) States.AFK=v end})
+    Tab3:Section({Title = "CONFIGURAÇÕES"})
+    Tab3:Toggle({Title = "Anti AFK", Default = false, Callback = function(s) setAntiAFK(s) end})
+    Tab3:Toggle({Title = "Noclip", Default = false, Callback = function(s) setNoclip(s) end})
+    Tab3:Toggle({Title = "Inf Jump", Default = false, Callback = function(s) setInfJump(s) end})
+    Tab3:Toggle({Title = "Fullbright", Default = false, Callback = function(s) setFullbright(s) end})
+    Tab3:Toggle({Title = "Xray", Default = false, Callback = function(s) setXray(s) end})
 
-    TESP:Section({Title="ESP"})
-    TESP:Toggle({Title="Ativar ESP", Default=false, Callback=function(v) States.ESP=v end})
+    Tab4:Section({Title = "ESP INTELIGENTE"})
+    Tab4:Toggle({Title = "Ativar ESP", Default = false, Callback = function(s) setESP(s) end})
+    Tab4:Toggle({Title = "Mostrar Inocentes", Default = true, Callback = function(s) States.ShowInnocents = s end})
 
-    TPlr:Section({Title="STATS"})
-    TPlr:Toggle({Title="Velocidade Custom", Default=false, Callback=function(v) States.Spd=v end})
-    TPlr:Slider({Title="Velocidade", Value={Min=16,Max=200,Default=16}, Callback=function(v) Set.Speed=v end})
+    Tab5:Section({Title = "PERSONAGEM"})
+    Tab5:Toggle({Title = "Velocidade Custom", Default = false, Callback = function(s) States.Speed = s end})
+    Tab5:Slider({Title = "Velocidade", Value = {Min = 16, Max = 200, Default = 16}, Callback = function(v) Settings.Speed = v end})
+    Tab5:Toggle({Title = "Pulo Custom", Default = false, Callback = function(s) States.Jump = s end})
+    Tab5:Slider({Title = "Pulo", Value = {Min = 50, Max = 250, Default = 50}, Callback = function(v) Settings.JumpPower = v end})
+    Tab5:Toggle({Title = "Fly", Default = false, Callback = function(s) setFly(s) end})
+    Tab5:Slider({Title = "Velocidade do Fly", Value = {Min = 10, Max = 300, Default = 60}, Callback = function(v) Settings.FlySpeed = v end})
+    Tab5:Toggle({Title = "Spin", Default = false, Callback = function(s) setSpin(s) end})
 
-    TComb:Section({Title="COMBAT"})
-    TComb:Paragraph({Title="Aviso", Desc=isPremium and "Liberado!" or "Exige Key Premium!"})
+    Tab6:Section({Title = "COMBAT"})
+    Tab6:Toggle({Title = "Aimbot / Camera Lock", Default = false, Callback = function(s) setAimbot(s) end})
+    Tab6:Toggle({Title = "Aura de Fogo", Default = false, Callback = function(s) setFireAura(s) end})
 
-    TFling:Section({Title="FLING"})
-    TFling:Paragraph({Title="Aviso", Desc=isPremium and "Liberado!" or "Exige Key Premium!"})
+    Tab7:Section({Title = "TELEPORTE"})
+    local plist = {"Nenhum"} for _, p in ipairs(Players:GetPlayers()) do if p ~= LocalPlayer then table.insert(plist, p.Name) end end
+    Tab7:Dropdown({Title = "Ir para jogador", Values = plist, Multi = false, Callback = function(sel) tpToPlayer(sel) end})
+    Tab7:Input({Title = "Nome do Waypoint", Placeholder = "ex: base", Callback = function(v) Settings._wayName = v end})
+    Tab7:Button({Title = "Salvar Posição", Callback = function() if Settings._wayName ~= "" then saveWaypoint(Settings._wayName) end end})
+    Tab7:Button({Title = "Ir para Waypoint", Callback = function() gotoWaypoint(Settings._wayName) end})
 
-    TDance:Section({Title="DANÇAS"})
-    TDance:Button({Title="Dança: Floss", Callback=function()
-        getChar(); if hum then local an = Instance.new("Animation"); an.AnimationId = "rbxassetid://5917459342"; hum:LoadAnimation(an):Play() end
-    end})
+    FlingTab:Section({Title = "FLING"})
+    FlingTab:Button({Title = "Fling All", Callback = function() flingAll() end})
+    FlingTab:Button({Title = "Parar Fling", Callback = function() stopFling() end})
 
-    TCmd:Section({Title="COMANDOS OP"})
-    TCmd:Paragraph({Title="Lista", Desc="fly / speed / jump / noclip / esp"})
+    DanceTab:Section({Title = "DANÇAS E EMOTES"})
+    for name, id in pairs(DANCES) do
+        DanceTab:Button({Title = "Dança: " .. name, Callback = function() playCustomAnimation(id) end})
+    end
+    DanceTab:Button({Title = "Parar Dança", Callback = function() stopCustomAnimation() end})
 
-    RS.Heartbeat:Connect(function()
-        getChar()
-        if hum and States.Spd then hum.WalkSpeed = Set.Speed end
+    CmdTab:Section({Title = "COMANDOS"})
+    CmdTab:Paragraph({Title = "Info", Desc = "Use o painel flutuante para comandos rápidos."})
+
+    RunService.Heartbeat:Connect(function()
+        local _, hum = getChar()
+        if hum then
+            if States.Speed then hum.WalkSpeed = Settings.Speed end
+            if States.Jump then hum.JumpPower = Settings.JumpPower end
+        end
     end)
 end
