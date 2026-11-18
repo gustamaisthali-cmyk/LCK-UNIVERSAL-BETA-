@@ -1,5 +1,5 @@
 -- =====================================================================
--- SUS HUB | Eu ❤️ sua mãe v.11.0 — LCK SCRIPT (Com Sistema de Cadeado & Texturas)
+-- SUS HUB | Eu ❤️ sua mãe v.11.0 — LCK SCRIPT (Mobile Otimizado & Seguro)
 -- =====================================================================
 
 local API_CONFIG = {
@@ -13,44 +13,56 @@ local API_CONFIG = {
     VALID_KEY = "FREE-X991-AJ89-WH2L-CK72"
 }
 
-local FOLDER = "SUS_HUB_CONFIG"
-local KEY_FILE = FOLDER .. "/KeyData.json"
-
 local Players           = game:GetService("Players")
 local HttpService       = game:GetService("HttpService")
-local TweenService      = game:GetService("TweenService")
 local UserInputService  = game:GetService("UserInputService")
 local StarterGui        = game:GetService("StarterGui")
 local RunService        = game:GetService("RunService")
 local MarketplaceService = game:GetService("MarketplaceService")
 
 local LocalPlayer = Players.LocalPlayer
-local Camera      = workspace.CurrentCamera
-local Mouse       = LocalPlayer:GetMouse()
 
-local IsFileFunc    = isfile or function() return false end
-local ReadFileFunc  = readfile or function() return "" end
-local WriteFileFunc = writefile or function() end
-local MakeFolderFunc= makefolder or function() end
-local IsFolderFunc  = isfolder or function() return false end
+local function Protect(gui)
+    pcall(function()
+        if gethui then
+            gui.Parent = gethui()
+        elseif game:GetService("CoreGui"):FindFirstChild("RobloxGui") then
+            gui.Parent = game:GetService("CoreGui")
+        else
+            gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+        end
+    end)
+end
+
+local function Notify(title, desc, duration)
+    pcall(function()
+        StarterGui:SetCore("SendNotification", {
+            Title = title or "SUS HUB v.11.0",
+            Text = desc or "",
+            Duration = duration or 4,
+        })
+    end)
+end
 
 -- =====================================================================
--- SISTEMAS DE TEXTURAS
+-- SISTEMAS DE TEXTURAS SEGUROS
 -- =====================================================================
 local faces = {"Front", "Back", "Bottom", "Top", "Right", "Left"}
 
 local function applyTextureToPart(part, textureId)
-    for _, face in ipairs(faces) do
-        local tex = Instance.new("Texture")
-        tex.Texture = textureId
-        tex.Face = Enum.NormalId[face]
-        tex.Color3 = part.Color
-        tex.Transparency = part.Transparency
-        tex.Parent = part
-    end
+    pcall(function()
+        for _, face in ipairs(faces) do
+            local tex = Instance.new("Texture")
+            tex.Texture = textureId
+            tex.Face = Enum.NormalId[face]
+            tex.Color3 = part.Color
+            tex.Transparency = part.Transparency
+            tex.Parent = part
+        end
+    end)
 end
 
--- Textura Minecraft (Liberada no Free)
+-- Textura Minecraft (Livre no Free)
 local minecraftMaterials = {
     {"Wood", "rbxassetid://3258599312"},
     {"WoodPlanks", "rbxassetid://8676581022"},
@@ -68,20 +80,22 @@ local minecraftMaterials = {
 }
 
 local function runMinecraftTexturing()
-    for _, part in ipairs(workspace:GetDescendants()) do
-        if part:IsA("BasePart") then
-            for _, mat in ipairs(minecraftMaterials) do
-                if part.Material.Name == mat[1] then
-                    applyTextureToPart(part, mat[2])
-                    part.Material = Enum.Material.SmoothPlastic
-                    break
+    pcall(function()
+        for _, part in ipairs(workspace:GetDescendants()) do
+            if part:IsA("BasePart") then
+                for _, mat in ipairs(minecraftMaterials) do
+                    if part.Material.Name == mat[1] then
+                        applyTextureToPart(part, mat[2])
+                        part.Material = Enum.Material.SmoothPlastic
+                        break
+                    end
                 end
             end
         end
-    end
+    end)
 end
 
--- Texturas Reais Oficiais (Bloqueadas com cadeado para Free, liberadas no Premium)
+-- Texturas Reais Oficiais (Com Cadeado no Free / Liberado no Premium)
 local materialTextures = {
     {"Grass", "rbxassetid://7547167347"},
     {"Stone", "rbxassetid://7546651802"},
@@ -96,67 +110,24 @@ local materialTextures = {
 }
 
 local function runCustomTexturing()
-    for _, part in ipairs(workspace:GetDescendants()) do
-        if part:IsA("BasePart") then
-            for _, mat in ipairs(materialTextures) do
-                applyTextureToPart(part, mat[2])
-                break
+    pcall(function()
+        for _, part in ipairs(workspace:GetDescendants()) do
+            if part:IsA("BasePart") then
+                for _, mat in ipairs(materialTextures) do
+                    applyTextureToPart(part, mat[2])
+                    break
+                end
             end
         end
-    end
+    end)
 end
 
 local function GetHWID()
-    local hwid
-    if gethwid then pcall(function() hwid = gethwid() end) end
-    if get_hwid then pcall(function() hwid = get_hwid() end) end
-    if not hwid or tostring(hwid) == "" then
-        pcall(function() hwid = game:GetService("RbxAnalyticsService"):GetClientId() end)
-    end
-    if not hwid or tostring(hwid) == "" then
-        hwid = "FALLBACK-" .. tostring(LocalPlayer.UserId) .. "-" .. tostring(game.PlaceId)
-    end
+    local hwid = "MOBILE-USER-" .. tostring(LocalPlayer.UserId)
+    pcall(function()
+        if gethwid then hwid = gethwid() end
+    end)
     return tostring(hwid)
-end
-
-local function Protect(gui)
-    local env = (getgenv and getgenv()) or _G
-    if env.HIDEUI then
-        gui.Parent = env.HIDEUI
-    elseif gethui then
-        gui.Parent = gethui()
-    else
-        gui.Parent = game:GetService("CoreGui")
-    end
-end
-
-local function Notify(title, desc, duration)
-    pcall(function()
-        StarterGui:SetCore("SendNotification", {
-            Title = title or "SUS HUB v.11.0",
-            Text = desc or "",
-            Duration = duration or 5,
-        })
-    end)
-end
-
-local function SaveKeyData()
-    pcall(function()
-        if not IsFolderFunc(FOLDER) then MakeFolderFunc(FOLDER) end
-        WriteFileFunc(KEY_FILE, HttpService:JSONEncode({ time = os.time() + 86400 }))
-    end)
-end
-
-local function CheckSavedKey()
-    if IsFolderFunc(FOLDER) and IsFileFunc(KEY_FILE) then
-        local ok, v = pcall(function() return HttpService:JSONDecode(ReadFileFunc(KEY_FILE)) end)
-        if ok and type(v) == "table" and v.time then
-            if os.time() < v.time then
-                return true, math.floor((v.time - os.time()) / 3600)
-            end
-        end
-    end
-    return false, 0
 end
 
 -- =====================================================================
@@ -207,110 +178,7 @@ local function LaunchSUSHub(isPremium)
     titleLbl.Font, titleLbl.TextSize = Enum.Font.GothamBold, 11
     titleLbl.Parent = titleBar
 
-    -- PAINEL DE SETTINGS
-    local settingsPopup = Instance.new("Frame", main)
-    settingsPopup.Size = UDim2.fromOffset(285, 250)
-    settingsPopup.AnchorPoint = Vector2.new(0.5, 0.5)
-    settingsPopup.Position = UDim2.fromScale(0.5, 0.5)
-    settingsPopup.BackgroundColor3 = Color3.fromRGB(26, 18, 14)
-    settingsPopup.Visible = false
-    settingsPopup.ZIndex = 50
-    Instance.new("UICorner", settingsPopup).CornerRadius = UDim.new(0, 10)
-    Instance.new("UIStroke", settingsPopup).Color = COLORS.accent
-
-    local spTitle = Instance.new("TextLabel", settingsPopup)
-    spTitle.Size = UDim2.new(1, 0, 0, 32)
-    spTitle.Position = UDim2.fromOffset(0, 5)
-    spTitle.BackgroundTransparency = 1
-    spTitle.Text = "⚙️ Settings & Font Manager"
-    spTitle.TextColor3 = COLORS.accent
-    spTitle.Font = Enum.Font.GothamBold
-    spTitle.TextSize = 12
-    spTitle.ZIndex = 51
-
-    local function addSettingOption(text, yPos, callback)
-        local btn = Instance.new("TextButton", settingsPopup)
-        btn.Size = UDim2.new(1, -24, 0, 30)
-        btn.Position = UDim2.fromOffset(12, yPos)
-        btn.BackgroundColor3 = Color3.fromRGB(35, 24, 18)
-        btn.Text = "  " .. text
-        btn.TextColor3 = COLORS.text
-        btn.Font = Enum.Font.GothamMedium
-        btn.TextSize = 10
-        btn.TextXAlignment = Enum.TextXAlignment.Left
-        btn.ZIndex = 51
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-        Instance.new("UIStroke", btn).Color = Color3.fromRGB(80, 50, 35)
-        btn.MouseButton1Click:Connect(callback)
-        return btn
-    end
-
-    addSettingOption("🎨 Tema Sunset (Laranja LCK)", 40, function()
-        COLORS.accent = Color3.fromRGB(255, 140, 0)
-        mainStroke.Color = COLORS.accent
-        Notify("Theme", "Tema Sunset aplicado!", 2)
-        settingsPopup.Visible = false
-    end)
-
-    addSettingOption("🟣 Tema Purple (Roxo)", 75, function()
-        COLORS.accent = Color3.fromRGB(160, 80, 255)
-        mainStroke.Color = COLORS.accent
-        Notify("Theme", "Tema Purple aplicado!", 2)
-        settingsPopup.Visible = false
-    end)
-
-    addSettingOption("💬 Fonte: Gotham", 110, function()
-        titleLbl.Font = Enum.Font.GothamBold
-        Notify("Font", "Fonte Gotham aplicada!", 2)
-        settingsPopup.Visible = false
-    end)
-
-    addSettingOption("💬 Fonte: Arcade", 145, function()
-        titleLbl.Font = Enum.Font.Arcade
-        Notify("Font", "Fonte Arcade aplicada!", 2)
-        settingsPopup.Visible = false
-    end)
-
-    local spClose = Instance.new("TextButton", settingsPopup)
-    spClose.Size = UDim2.new(1, -24, 0, 30)
-    spClose.Position = UDim2.fromOffset(12, 195)
-    spClose.BackgroundColor3 = Color3.fromRGB(80, 30, 30)
-    spClose.Text = "Close"
-    spClose.TextColor3 = Color3.fromRGB(255, 120, 120)
-    spClose.Font = Enum.Font.GothamBold
-    spClose.TextSize = 11
-    spClose.ZIndex = 51
-    Instance.new("UICorner", spClose).CornerRadius = UDim.new(0, 6)
-    spClose.MouseButton1Click:Connect(function() settingsPopup.Visible = false end)
-
-    local topButtonsHolder = Instance.new("Frame", titleBar)
-    topButtonsHolder.Size = UDim2.fromOffset(160, 30)
-    topButtonsHolder.Position = UDim2.new(1, -195, 0.5, -15)
-    topButtonsHolder.BackgroundTransparency = 1
-
-    local function makeTopHeaderBtn(text, xPos, callback)
-        local btn = Instance.new("TextButton", topButtonsHolder)
-        btn.Size = UDim2.fromOffset(72, 26)
-        btn.Position = UDim2.fromOffset(xPos, 2)
-        btn.BackgroundColor3 = Color3.fromRGB(35, 24, 18)
-        btn.Text = text
-        btn.TextColor3 = COLORS.accent
-        btn.Font = Enum.Font.GothamBold
-        btn.TextSize = 10
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-        Instance.new("UIStroke", btn).Color = COLORS.accent
-        btn.MouseButton1Click:Connect(callback)
-        return btn
-    end
-
-    makeTopHeaderBtn("⚙️ Settings", 0, function()
-        settingsPopup.Visible = not settingsPopup.Visible
-    end)
-
-    makeTopHeaderBtn("⭐ Credits", 78, function()
-        Notify("Credits", "Criado por LCK SCRIPT", 2)
-    end)
-
+    -- BOTÃO DE FECHAR O HUB (X)
     local closeBtn = Instance.new("TextButton")
     closeBtn.Size, closeBtn.Position = UDim2.fromOffset(26, 26), UDim2.new(1, -32, 0.5, -13)
     closeBtn.BackgroundColor3, closeBtn.Text = Color3.fromRGB(80, 30, 30), "✕"
@@ -318,7 +186,7 @@ local function LaunchSUSHub(isPremium)
     closeBtn.Parent = titleBar
     Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
 
-    -- Botão flutuante para abrir o menu
+    -- BOTÃO FLUTUANTE PARA ABRIR O HUB (Na lateral esquerda)
     local openBtn = Instance.new("TextButton")
     openBtn.Size = UDim2.fromOffset(110, 34)
     openBtn.Position = UDim2.new(0, 15, 0.5, -17)
@@ -342,7 +210,7 @@ local function LaunchSUSHub(isPremium)
         openBtn.Visible = false
     end)
 
-    -- Arrastar Hub
+    -- Sistema de Arrastar (Hub Principal)
     do
         local dragging, dragStart, startPos
         titleBar.InputBegan:Connect(function(i)
@@ -361,7 +229,7 @@ local function LaunchSUSHub(isPremium)
         end)
     end
 
-    -- Arrastar Botão Flutuante
+    -- Sistema de Arrastar (Botão Flutuante)
     do
         local dragging, dragStart, startPos
         openBtn.InputBegan:Connect(function(i)
@@ -514,26 +382,28 @@ local function LaunchSUSHub(isPremium)
     local startTime = tick()
     local frameCount, lastTick = 0, tick()
     RunService.RenderStepped:Connect(function()
-        frameCount = frameCount + 1
-        local now = tick()
-        if now - lastTick >= 1 then
-            local fps = math.floor(frameCount / (now - lastTick))
-            local ping = 0
-            pcall(function() ping = math.floor(LocalPlayer:GetNetworkPing() * 1000) end)
-            
-            local elapsed = math.floor(now - startTime)
-            local hrs = math.floor(elapsed / 3600)
-            local mins = math.floor((elapsed % 3600) / 60)
-            local secs = elapsed % 60
-            
-            FpsVal.Text = fps .. " FPS"
-            PingVal.Text = math.clamp(ping, 1, 999) .. " ms"
-            UptimeVal.Text = string.format("%02d:%02d:%02d", hrs, mins, secs)
-            PlayersVal.Text = #Players:GetPlayers() .. " / " .. Players.MaxPlayers
-            
-            frameCount = 0
-            lastTick = now
-        end
+        pcall(function()
+            frameCount = frameCount + 1
+            local now = tick()
+            if now - lastTick >= 1 then
+                local fps = math.floor(frameCount / (now - lastTick))
+                local ping = 0
+                pcall(function() ping = math.floor(LocalPlayer:GetNetworkPing() * 1000) end)
+                
+                local elapsed = math.floor(now - startTime)
+                local hrs = math.floor(elapsed / 3600)
+                local mins = math.floor((elapsed % 3600) / 60)
+                local secs = elapsed % 60
+                
+                FpsVal.Text = fps .. " FPS"
+                PingVal.Text = math.clamp(ping, 1, 999) .. " ms"
+                UptimeVal.Text = string.format("%02d:%02d:%02d", hrs, mins, secs)
+                PlayersVal.Text = #Players:GetPlayers() .. " / " .. Players.MaxPlayers
+                
+                frameCount = 0
+                lastTick = now
+            end
+        end)
     end)
 
     local RightPanel = Instance.new("Frame", MainFrame)
@@ -603,7 +473,6 @@ local function LaunchSUSHub(isPremium)
         Notify("Sucesso", "Instagram copiado!", 2)
     end)
 
-
     -- PÁGINA 2: INFORMAÇÕES
     local InfoFrame = Instance.new("Frame", ContentArea)
     InfoFrame.Size = UDim2.fromScale(1, 1)
@@ -669,7 +538,6 @@ local function LaunchSUSHub(isPremium)
         pcall(function() loadstring(game:HttpGet("https://pastefy.app/SglyCstp/raw"))() end)
     end)
 
-
     -- PÁGINA 3: ABA DE TEXTURAS (COM CADEADO PARA FREE E LIBERADO NO PREMIUM)
     local TexturaFrame = Instance.new("Frame", ContentArea)
     TexturaFrame.Size = UDim2.fromScale(1, 1)
@@ -724,7 +592,7 @@ local function LaunchSUSHub(isPremium)
 
     MinecraftBtn.MouseButton1Click:Connect(function()
         Notify("Textura Minecraft", "Aplicando texturas do Minecraft...", 2)
-        pcall(runMinecraftTexturing)
+        runMinecraftTexturing()
     end)
 
     -- Botão 2: Texturas Reais Oficiais (Com Cadeado se for Free / Liberado se for Premium)
@@ -760,12 +628,11 @@ local function LaunchSUSHub(isPremium)
     RealTexBtn.MouseButton1Click:Connect(function()
         if isPremium then
             Notify("Texturas Reais", "Aplicando IDs oficiais no mapa...", 2)
-            pcall(runCustomTexturing)
+            runCustomTexturing()
         else
             Notify("Bloqueado 🔒", "Insira a Key Premium para usar esta textura avançada!", 3)
         end
     end)
-
 
     -- SISTEMA DE TROCA DE ABAS
     local function setActiveTab(activeBtn, targetFrame)
@@ -1056,7 +923,6 @@ local function ShowKeySystem()
     EnterKeyBtn.MouseButton1Click:Connect(function()
         local entered = KeyInput.Text:gsub("%s+", "")
         if entered == API_CONFIG.VALID_KEY then
-            SaveKeyData()
             StatusLbl.Text = "🟢 Key Válida! Premium..."
             StatusLbl.TextColor3 = Color3.fromRGB(0, 255, 100)
             task.wait(0.5)
@@ -1070,11 +936,4 @@ local function ShowKeySystem()
 end
 
 -- Inicialização
-local hasKey, hoursLeft = CheckSavedKey()
-if hasKey then
-    Notify("SUS Hub", "Chave salva ativa por mais " .. hoursLeft .. "h!", 4)
-    LaunchSUSHub(true)
-else
-    ShowKeySystem()
-end
-
+ShowKeySystem()
