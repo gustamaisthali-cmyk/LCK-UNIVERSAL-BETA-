@@ -58,19 +58,6 @@ local function Notify(title, desc, duration)
     end)
 end
 
-local function GetHWID()
-    local hwid = "MOBILE-USER-" .. tostring(LocalPlayer.UserId)
-    pcall(function()
-        if typeof(gethwid) == "function" then
-            local fetched = gethwid()
-            if fetched and tostring(fetched) ~= "" then
-                hwid = tostring(fetched)
-            end
-        end
-    end)
-    return hwid
-end
-
 -- =====================================================================
 -- SISTEMAS DE TEXTURAS (SEM DUPLICAR AO CLICAR NOVAMENTE)
 -- =====================================================================
@@ -420,13 +407,13 @@ local function LaunchSUSHub(isPremium)
     end
 
     -- =====================================================================
-    -- ABA 1: MAIN (FOTO + FPS DE UM LADO / INSTAGRAM, YOUTUBE, DISCORD)
+    -- ABA 1: MAIN (ESQUERDA: FOTO + FPS | DIREITA: APENAS INSTAGRAM, YOUTUBE, DISCORD)
     -- =====================================================================
-    local MainFrame = createTabScroll("MAIN - PERFIL & REDES", 230)
+    local MainFrame = createTabScroll("MAIN", 220)
     MainFrame.Visible = true
 
     local leftMain = Instance.new("Frame", MainFrame)
-    leftMain.Size = UDim2.fromOffset(210, 185)
+    leftMain.Size = UDim2.fromOffset(205, 180)
     leftMain.Position = UDim2.fromOffset(0, 32)
     leftMain.BackgroundColor3 = COLORS.rowBg
     Instance.new("UICorner", leftMain).CornerRadius = UDim.new(0, 8)
@@ -434,29 +421,20 @@ local function LaunchSUSHub(isPremium)
 
     local avatarImg = Instance.new("ImageLabel", leftMain)
     avatarImg.Size = UDim2.fromOffset(74, 74)
-    avatarImg.Position = UDim2.new(0.5, -37, 0, 14)
+    avatarImg.Position = UDim2.new(0.5, -37, 0, 16)
     avatarImg.BackgroundColor3 = COLORS.panel
     avatarImg.Image = PlayerAvatarUrl
     Instance.new("UICorner", avatarImg).CornerRadius = UDim.new(1, 0)
     Instance.new("UIStroke", avatarImg).Color = COLORS.accent
 
-    local pNameLbl = Instance.new("TextLabel", leftMain)
-    pNameLbl.Size = UDim2.new(1, -12, 0, 20)
-    pNameLbl.Position = UDim2.fromOffset(6, 94)
-    pNameLbl.BackgroundTransparency = 1
-    pNameLbl.Text = LocalPlayer.Name
-    pNameLbl.TextColor3 = COLORS.text
-    pNameLbl.Font = Enum.Font.GothamBold
-    pNameLbl.TextSize = 12
-
     local fpsLbl = Instance.new("TextLabel", leftMain)
-    fpsLbl.Size = UDim2.new(1, -12, 0, 22)
-    fpsLbl.Position = UDim2.fromOffset(6, 122)
+    fpsLbl.Size = UDim2.new(1, -12, 0, 26)
+    fpsLbl.Position = UDim2.fromOffset(6, 108)
     fpsLbl.BackgroundTransparency = 1
     fpsLbl.Text = "FPS: 60"
     fpsLbl.TextColor3 = Color3.fromRGB(90, 235, 110)
     fpsLbl.Font = Enum.Font.GothamBold
-    fpsLbl.TextSize = 13
+    fpsLbl.TextSize = 14
 
     do
         local frames, accum = 0, 0
@@ -471,43 +449,50 @@ local function LaunchSUSHub(isPremium)
         end)
     end
 
-    local function makeRightSocialCard(title, sub, yPos, onClick)
-        local btn = Instance.new("TextButton", MainFrame)
-        btn.Size = UDim2.fromOffset(284, 56)
-        btn.Position = UDim2.fromOffset(218, yPos)
+    local rightMain = Instance.new("Frame", MainFrame)
+    rightMain.Size = UDim2.fromOffset(286, 180)
+    rightMain.Position = UDim2.fromOffset(214, 32)
+    rightMain.BackgroundTransparency = 1
+
+    local function makeCleanSocialItem(label, subtitle, yPos, onClick)
+        local btn = Instance.new("TextButton", rightMain)
+        btn.Size = UDim2.new(1, 0, 0, 54)
+        btn.Position = UDim2.fromOffset(0, yPos)
         btn.BackgroundColor3 = COLORS.rowBg
         btn.Text = ""
         Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
         Instance.new("UIStroke", btn).Color = Color3.fromRGB(65, 44, 30)
 
         local t1 = Instance.new("TextLabel", btn)
-        t1.Size, t1.Position = UDim2.new(1, -16, 0, 20), UDim2.fromOffset(10, 7)
+        t1.Size, t1.Position = UDim2.new(1, -16, 0, 20), UDim2.fromOffset(12, 7)
         t1.BackgroundTransparency = 1
-        t1.Text, t1.TextColor3 = title, Color3.fromRGB(255, 170, 75)
-        t1.Font, t1.TextSize = Enum.Font.GothamBold, 11
+        t1.Text, t1.TextColor3 = label, Color3.fromRGB(255, 170, 75)
+        t1.Font, t1.TextSize = Enum.Font.GothamBold, 12
         t1.TextXAlignment = Enum.TextXAlignment.Left
 
         local t2 = Instance.new("TextLabel", btn)
-        t2.Size, t2.Position = UDim2.new(1, -16, 0, 16), UDim2.fromOffset(10, 29)
+        t2.Size, t2.Position = UDim2.new(1, -16, 0, 16), UDim2.fromOffset(12, 28)
         t2.BackgroundTransparency = 1
-        t2.Text, t2.TextColor3 = sub, COLORS.dim
-        t2.Font, t1.TextSize = Enum.Font.Gotham, 10
+        t2.Text, t2.TextColor3 = subtitle, COLORS.dim
+        t2.Font, t2.TextSize = Enum.Font.Gotham, 10
         t2.TextXAlignment = Enum.TextXAlignment.Left
 
         btn.MouseButton1Click:Connect(onClick)
     end
 
-    makeRightSocialCard("Instagram", "Copiar @011.gustavofx", 32, function()
+    makeCleanSocialItem("Instagram", "@011.gustavofx", 0, function()
         pcall(function() setclipboard(API_CONFIG.INSTAGRAM_URL) end)
-        Notify("Instagram", "Link copiado!")
+        Notify("Instagram", "Copiado!")
     end)
-    makeRightSocialCard("YouTube", "Copiar @LCK_SCRIPT", 96, function()
+
+    makeCleanSocialItem("YouTube", "@LCK_SCRIPT", 63, function()
         pcall(function() setclipboard(API_CONFIG.YOUTUBE_URL) end)
-        Notify("YouTube", "Link copiado!")
+        Notify("YouTube", "Copiado!")
     end)
-    makeRightSocialCard("Discord", "Copiar servidor Discord", 160, function()
+
+    makeCleanSocialItem("Discord", "Servidor Oficial", 126, function()
         pcall(function() setclipboard(API_CONFIG.DISCORD_INVITE) end)
-        Notify("Discord", "Convite copiado!")
+        Notify("Discord", "Copiado!")
     end)
 
     -- =====================================================================
@@ -554,7 +539,7 @@ local function LaunchSUSHub(isPremium)
     end)
 
     -- =====================================================================
-    -- ABA 4: JOGADOR (BARRA DE PUXAR + VALOR + BOTAO + FLY COM FORCA DE PULO)
+    -- ABA 4: JOGADOR
     -- =====================================================================
     local PlayerFrame = createTabScroll("CONTROLES DO JOGADOR", 630)
 
@@ -650,7 +635,6 @@ local function LaunchSUSHub(isPremium)
         end
     end)
 
-    -- Pulo infinito + forca do pulo (tambem da impulso para cima quando estiver no Fly)
     UserInputService.JumpRequest:Connect(function()
         local char = LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
@@ -669,7 +653,6 @@ local function LaunchSUSHub(isPremium)
         end
     end)
 
-    -- Barra para puxar + mostra o numero + botao para aplicar
     local function createPullSliderRow(labelText, minVal, maxVal, defaultVal, yPos, onApply)
         local row = Instance.new("Frame", PlayerFrame)
         row.Size = UDim2.new(1, -4, 0, 58)
@@ -765,7 +748,6 @@ local function LaunchSUSHub(isPremium)
         end)
     end
 
-    -- Velocidade (puxa barra + ve valor + aperta Usar)
     createPullSliderRow("Velocidade (Speed)", 16, 250, walkSpeedVal, 34, function(val)
         walkSpeedVal = val
         local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
@@ -773,7 +755,6 @@ local function LaunchSUSHub(isPremium)
         Notify("Speed", "Velocidade aplicada: " .. walkSpeedVal, 2)
     end)
 
-    -- Forca do pulo (puxa barra + ve valor + aperta Usar)
     createPullSliderRow("Forca do Pulo (Tambem no Fly)", 50, 350, jumpForceVal, 98, function(val)
         jumpForceVal = val
         local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
@@ -784,13 +765,11 @@ local function LaunchSUSHub(isPremium)
         Notify("Forca do Pulo", "Forca aplicada: " .. jumpForceVal, 2)
     end)
 
-    -- Velocidade do Fly (puxa barra + ve valor + aperta Usar)
     createPullSliderRow("Velocidade do Fly", 10, 250, flySpeedVal, 162, function(val)
         flySpeedVal = val
         Notify("Fly", "Velocidade do Fly: " .. flySpeedVal, 2)
     end)
 
-    -- Botoes com ON / OFF para desativar quando quiser
     do
         local c, lbl = createCard(PlayerFrame, "Fly: OFF", "Aperte para ativar ou desativar o Fly", 228, Color3.fromRGB(255, 170, 75), nil)
         c.MouseButton1Click:Connect(function()
