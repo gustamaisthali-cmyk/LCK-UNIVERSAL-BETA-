@@ -99,7 +99,7 @@ local minecraftMaterials = {
 local mcAppliedOnce = false
 local function runMinecraftTexturing()
     if mcAppliedOnce then
-        Notify("Textura Minecraft", "Ja esta aplicada no mapa!", 2)
+        Notify("Textura Minecraft", "Ja aplicada no mapa (sem duplicar).", 2)
         return
     end
     mcAppliedOnce = true
@@ -196,6 +196,149 @@ local function applyMinecraftNameTag(char)
     end)
 end
 
+local function stackTexturesOnCharacter(id1, id2)
+    pcall(function()
+        local char = LocalPlayer.Character
+        if not char then return end
+        local torso = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
+        if not torso then return end
+
+        local oldGui = torso:FindFirstChild("StackedTexGui")
+        if oldGui then oldGui:Destroy() end
+
+        local sg = Instance.new("SurfaceGui")
+        sg.Name = "StackedTexGui"
+        sg.Face = Enum.NormalId.Front
+        sg.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+        sg.PixelsPerStud = 50
+        sg.Parent = torso
+
+        local img1 = Instance.new("ImageLabel")
+        img1.Size = UDim2.fromScale(1, 1)
+        img1.BackgroundTransparency = 1
+        img1.Image = id1
+        img1.ZIndex = 1
+        img1.Parent = sg
+
+        local img2 = Instance.new("ImageLabel")
+        img2.Size = UDim2.fromScale(1, 1)
+        img2.BackgroundTransparency = 1
+        img2.Image = id2
+        img2.ZIndex = 2
+        img2.Parent = sg
+    end)
+    Notify("Texturas Empilhadas", "Camadas aplicadas no corpo!", 2)
+end
+
+-- =====================================================================
+-- SISTEMA DE ESP (JOGADORES)
+-- =====================================================================
+local espEnabled = false
+local espObjects = {}
+
+local function clearESPForPlayer(plr)
+    if espObjects[plr] then
+        pcall(function()
+            if espObjects[plr].highlight then espObjects[plr].highlight:Destroy() end
+            if espObjects[plr].tag then espObjects[plr].tag:Destroy() end
+        end)
+        espObjects[plr] = nil
+    end
+end
+
+local function applyESPToPlayer(plr)
+    if plr == LocalPlayer then return end
+    clearESPForPlayer(plr)
+    local char = plr.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    local head = char:FindFirstChild("Head")
+    if not root or not head then return end
+
+    local hl = Instance.new("Highlight")
+    hl.Name = "LCK_ESP_Highlight"
+    hl.Adornee = char
+    hl.FillColor = Color3.fromRGB(255, 136, 0)
+    hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+    hl.FillTransparency = 0.55
+    hl.OutlineTransparency = 0
+    hl.Parent = char
+
+    local tag = Instance.new("BillboardGui")
+    tag.Name = "LCK_ESP_Tag"
+    tag.Adornee = head
+    tag.Size = UDim2.fromOffset(170, 34)
+    tag.StudsOffset = Vector3.new(0, 2.2, 0)
+    tag.AlwaysOnTop = true
+    tag.Parent = head
+
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.fromScale(1, 1)
+    lbl.BackgroundTransparency = 1
+    lbl.TextColor3 = Color3.fromRGB(255, 180, 75)
+    lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+    lbl.TextStrokeTransparency = 0
+    lbl.Font = Enum.Font.GothamBold
+    lbl.TextSize = 11
+    lbl.Text = plr.Name
+    lbl.Parent = tag
+
+    espObjects[plr] = {highlight = hl, tag = tag, label = lbl, root = root}
+end
+
+local function setESPEnabled(state)
+    espEnabled = state
+    if not espEnabled then
+        for plr in pairs(espObjects) do
+            clearESPForPlayer(plr)
+        end
+        return
+    end
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            applyESPToPlayer(plr)
+        end
+    end
+end
+
+Players.PlayerAdded:Connect(function(plr)
+    plr.CharacterAdded:Connect(function()
+        task.wait(0.3)
+        if espEnabled then applyESPToPlayer(plr) end
+    end)
+end)
+
+Players.PlayerRemoving:Connect(function(plr)
+    clearESPForPlayer(plr)
+end)
+
+for _, plr in ipairs(Players:GetPlayers()) do
+    if plr ~= LocalPlayer then
+        plr.CharacterAdded:Connect(function()
+            task.wait(0.3)
+            if espEnabled then applyESPToPlayer(plr) end
+        end)
+    end
+end
+
+RunService.RenderStepped:Connect(function()
+    if not espEnabled then return end
+    local myRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    for plr, data in pairs(espObjects) do
+        if plr.Parent and data.root and data.root.Parent and data.label then
+            local distText = ""
+            if myRoot then
+                local d = math.floor((myRoot.Position - data.root.Position).Magnitude)
+                distText = " [" .. tostring(d) .. "m]"
+            end
+            data.label.Text = plr.Name .. distText
+        else
+            clearESPForPlayer(plr)
+            if plr.Character then applyESPToPlayer(plr) end
+        end
+    end
+end)
+
 -- =====================================================================
 -- PAINEL PRINCIPAL
 -- =====================================================================
@@ -215,16 +358,16 @@ local function LaunchSUSHub(isPremium)
     Protect(gui)
 
     local main = Instance.new("Frame")
-    main.Size = UDim2.fromOffset(550, 395)
-    main.Position = UDim2.new(0.5, -275, 0.5, -197)
+    main.Size = UDim2.fromOffset(550, 405)
+    main.Position = UDim2.new(0.5, -275, 0.5, -202)
     main.BackgroundColor3 = COLORS.bg
     main.BorderSizePixel = 0
     main.Parent = gui
     Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
 
     local titleBar = Instance.new("Frame")
-    titleBar.Size = UDim2.new(1, 0, 0, 48)
-    titleBar.Position = UDim2.fromOffset(0, 0)
+    titleBar.Size = UDim2.new(1, 0, 0, 56)
+    titleBar.Position = UDim2.fromOffset(0, 4)
     titleBar.BackgroundColor3 = COLORS.bg
     titleBar.BorderSizePixel = 0
     titleBar.Parent = main
@@ -237,11 +380,12 @@ local function LaunchSUSHub(isPremium)
 
     local statusText = isPremium and " • [PREMIUM]" or " • [FREE]"
     local titleLbl = Instance.new("TextLabel")
-    titleLbl.Size = UDim2.new(1, -60, 1, 0)
+    titleLbl.Size = UDim2.new(1, -60, 1, -4)
     titleLbl.Position = UDim2.fromOffset(14, 4)
     titleLbl.BackgroundTransparency = 1
     titleLbl.Text = SCRIPT_NAME .. "\n" .. gameName .. statusText
     titleLbl.TextXAlignment = Enum.TextXAlignment.Left
+    titleLbl.TextYAlignment = Enum.TextYAlignment.Center
     titleLbl.TextColor3 = Color3.fromRGB(255, 170, 75)
     titleLbl.Font = Enum.Font.GothamBold
     titleLbl.TextSize = 11
@@ -313,7 +457,7 @@ local function LaunchSUSHub(isPremium)
 
     local TabBar = Instance.new("Frame", main)
     TabBar.Size = UDim2.new(1, -28, 0, 32)
-    TabBar.Position = UDim2.fromOffset(14, 54)
+    TabBar.Position = UDim2.fromOffset(14, 64)
     TabBar.BackgroundTransparency = 1
 
     local function makeTabButton(text, xPos, width, locked)
@@ -337,8 +481,8 @@ local function LaunchSUSHub(isPremium)
     local PremiumTabBtn = makeTabButton("Premium", 392, 114, not isPremium)
 
     local OuterBox = Instance.new("Frame", main)
-    OuterBox.Size = UDim2.new(1, -28, 1, -100)
-    OuterBox.Position = UDim2.fromOffset(14, 92)
+    OuterBox.Size = UDim2.new(1, -28, 1, -112)
+    OuterBox.Position = UDim2.fromOffset(14, 102)
     OuterBox.BackgroundColor3 = COLORS.panel
     OuterBox.BorderSizePixel = 0
     Instance.new("UICorner", OuterBox).CornerRadius = UDim.new(0, 8)
@@ -406,8 +550,70 @@ local function LaunchSUSHub(isPremium)
         return card, tLbl
     end
 
+    -- Botao com selo ATIVAR / DESATIVAR (ON / OFF) claro
+    local function createToggleAbilityRow(parent, baseName, desc, yPos, initialState, onToggle)
+        local row = Instance.new("Frame", parent)
+        row.Size = UDim2.new(1, -4, 0, 50)
+        row.Position = UDim2.fromOffset(0, yPos)
+        row.BackgroundColor3 = COLORS.rowBg
+        Instance.new("UICorner", row).CornerRadius = UDim.new(0, 6)
+        Instance.new("UIStroke", row).Color = Color3.fromRGB(55, 38, 28)
+
+        local tLbl = Instance.new("TextLabel", row)
+        tLbl.Size = UDim2.new(0.72, -14, 0, 20)
+        tLbl.Position = UDim2.fromOffset(12, 6)
+        tLbl.BackgroundTransparency = 1
+        tLbl.Text = baseName
+        tLbl.TextColor3 = COLORS.text
+        tLbl.Font = Enum.Font.GothamBold
+        tLbl.TextSize = 11
+        tLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+        local dLbl = Instance.new("TextLabel", row)
+        dLbl.Size = UDim2.new(0.72, -14, 0, 16)
+        dLbl.Position = UDim2.fromOffset(12, 26)
+        dLbl.BackgroundTransparency = 1
+        dLbl.Text = desc
+        dLbl.TextColor3 = COLORS.dim
+        dLbl.Font = Enum.Font.Gotham
+        dLbl.TextSize = 10
+        dLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+        local state = initialState == true
+        local pill = Instance.new("TextButton", row)
+        pill.Size = UDim2.fromOffset(92, 30)
+        pill.Position = UDim2.new(1, -102, 0.5, -15)
+        pill.Font = Enum.Font.GothamBold
+        pill.TextSize = 10
+        Instance.new("UICorner", pill).CornerRadius = UDim.new(0, 6)
+
+        local function refreshPill()
+            if state then
+                pill.Text = "DESATIVAR"
+                pill.BackgroundColor3 = Color3.fromRGB(165, 38, 38)
+                pill.TextColor3 = Color3.fromRGB(255, 255, 255)
+            else
+                pill.Text = "ATIVAR"
+                pill.BackgroundColor3 = Color3.fromRGB(90, 235, 110)
+                pill.TextColor3 = Color3.fromRGB(15, 12, 10)
+            end
+        end
+        refreshPill()
+
+        pill.MouseButton1Click:Connect(function()
+            state = not state
+            refreshPill()
+            onToggle(state)
+        end)
+
+        return row, function(newState)
+            state = newState == true
+            refreshPill()
+        end
+    end
+
     -- =====================================================================
-    -- ABA 1: MAIN (ESQUERDA: FOTO + FPS | DIREITA: APENAS INSTAGRAM, YOUTUBE, DISCORD)
+    -- ABA 1: MAIN (ESQUERDA: FOTO + FPS | DIREITA: YOUTUBE, INSTAGRAM, DISCORD)
     -- =====================================================================
     local MainFrame = createTabScroll("MAIN", 220)
     MainFrame.Visible = true
@@ -480,17 +686,17 @@ local function LaunchSUSHub(isPremium)
         btn.MouseButton1Click:Connect(onClick)
     end
 
-    makeCleanSocialItem("Instagram", "@011.gustavofx", 0, function()
-        pcall(function() setclipboard(API_CONFIG.INSTAGRAM_URL) end)
-        Notify("Instagram", "Copiado!")
-    end)
-
-    makeCleanSocialItem("YouTube", "@LCK_SCRIPT", 63, function()
+    makeCleanSocialItem("YouTube", "@LCK_SCRIPT", 0, function()
         pcall(function() setclipboard(API_CONFIG.YOUTUBE_URL) end)
         Notify("YouTube", "Copiado!")
     end)
 
-    makeCleanSocialItem("Discord", "Servidor Oficial", 126, function()
+    makeCleanSocialItem("Instagram", "@011.gustavofx", 63, function()
+        pcall(function() setclipboard(API_CONFIG.INSTAGRAM_URL) end)
+        Notify("Instagram", "Copiado!")
+    end)
+
+    makeCleanSocialItem("Discord", "https://discord.gg/STYVn6SJ5", 126, function()
         pcall(function() setclipboard(API_CONFIG.DISCORD_INVITE) end)
         Notify("Discord", "Copiado!")
     end)
@@ -511,7 +717,7 @@ local function LaunchSUSHub(isPremium)
     -- =====================================================================
     -- ABA 3: TEXTURAS
     -- =====================================================================
-    local TexturaFrame = createTabScroll("GERENCIADOR DE TEXTURAS", 230)
+    local TexturaFrame = createTabScroll("GERENCIADOR DE TEXTURAS", 290)
     local mcNameEnabled = false
     LocalPlayer.CharacterAdded:Connect(function(char)
         if mcNameEnabled then
@@ -523,7 +729,8 @@ local function LaunchSUSHub(isPremium)
     createCard(TexturaFrame, "Textura Minecraft (FREE)", "Aplica textura do Minecraft uma vez sem duplicar", 34, Color3.fromRGB(90, 235, 110), function()
         runMinecraftTexturing()
     end)
-    createCard(TexturaFrame, "Nome Estilo Minecraft", "Aplica estilo pixelado/Arcade no seu nome", 92, Color3.fromRGB(110, 220, 255), function()
+
+    createCard(TexturaFrame, "Nome Estilo Minecraft", "Ativa ou desativa estilo pixelado/Arcade no nome", 92, Color3.fromRGB(110, 220, 255), function()
         mcNameEnabled = not mcNameEnabled
         if mcNameEnabled then
             applyMinecraftNameTag(LocalPlayer.Character)
@@ -538,10 +745,30 @@ local function LaunchSUSHub(isPremium)
         end
     end)
 
+    createCard(TexturaFrame, "Empilhar Texturas no Personagem", "Aplica duas camadas de textura no corpo", 150, Color3.fromRGB(255, 120, 190), function()
+        stackTexturesOnCharacter("rbxassetid://7546651802", "rbxassetid://7547167347")
+    end)
+
+    createCard(
+        TexturaFrame,
+        (isPremium and "[LIBERADO] " or "[PAGO / KEY] ") .. "Texturas Reais Avancadas",
+        isPremium and "Aplica texturas detalhadas no mapa" or "Requer Key valida ou versao paga",
+        208,
+        isPremium and Color3.fromRGB(90, 235, 110) or Color3.fromRGB(255, 115, 115),
+        function()
+            if isPremium then
+                Notify("Texturas Reais", "Aplicando texturas avancadas...", 2)
+                runCustomTexturing()
+            else
+                Notify("Bloqueado", "Requer Key valida / versao paga!", 3)
+            end
+        end
+    )
+
     -- =====================================================================
-    -- ABA 4: JOGADOR
+    -- ABA 4: JOGADOR (SLIDER + CAIXA + USAR + BOTOES ATIVAR/DESATIVAR + ESP)
     -- =====================================================================
-    local PlayerFrame = createTabScroll("CONTROLES DO JOGADOR", 630)
+    local PlayerFrame = createTabScroll("CONTROLES DO JOGADOR", 740)
 
     local walkSpeedVal = 24
     local jumpForceVal = 80
@@ -556,6 +783,8 @@ local function LaunchSUSHub(isPremium)
         controls = require(LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule"):WaitForChild("ControlModule"))
     end)
 
+    local setFlyVisualState
+
     local function stopFly()
         flyOn = false
         if flyConn then flyConn:Disconnect() flyConn = nil end
@@ -564,6 +793,7 @@ local function LaunchSUSHub(isPremium)
         local char = LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
         if hum then hum.PlatformStand = false end
+        if setFlyVisualState then setFlyVisualState(false) end
     end
 
     local function startFly()
@@ -575,6 +805,7 @@ local function LaunchSUSHub(isPremium)
         stopFly()
         flyOn = true
         hum.PlatformStand = true
+        if setFlyVisualState then setFlyVisualState(true) end
 
         bv = Instance.new("BodyVelocity")
         bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
@@ -770,45 +1001,37 @@ local function LaunchSUSHub(isPremium)
         Notify("Fly", "Velocidade do Fly: " .. flySpeedVal, 2)
     end)
 
-    do
-        local c, lbl = createCard(PlayerFrame, "Fly: OFF", "Aperte para ativar ou desativar o Fly", 228, Color3.fromRGB(255, 170, 75), nil)
-        c.MouseButton1Click:Connect(function()
-            if flyOn then
-                stopFly()
-                lbl.Text = "Fly: OFF"
-                Notify("Fly", "Fly desativado.", 2)
-            else
-                startFly()
-                lbl.Text = "Fly: ON"
-                Notify("Fly", "Fly ativado!", 2)
-            end
-        end)
-    end
+    _, setFlyVisualState = createToggleAbilityRow(PlayerFrame, "Fly", "Voar com controle e impulso de pulo", 228, false, function(active)
+        if active then
+            startFly()
+            Notify("Fly", "Fly ativado!", 2)
+        else
+            stopFly()
+            Notify("Fly", "Fly desativado.", 2)
+        end
+    end)
 
-    do
-        local c, lbl = createCard(PlayerFrame, "Pulo Infinito: OFF", "Aperte para ativar ou desativar o pulo infinito", 284, COLORS.text, nil)
-        c.MouseButton1Click:Connect(function()
-            infJumpOn = not infJumpOn
-            lbl.Text = "Pulo Infinito: " .. (infJumpOn and "ON" or "OFF")
-            Notify("Pulo Infinito", infJumpOn and "Ativado!" or "Desativado.", 2)
-        end)
-    end
+    createToggleAbilityRow(PlayerFrame, "Pulo Infinito", "Pula no ar usando a forca configurada", 284, false, function(active)
+        infJumpOn = active
+        Notify("Pulo Infinito", active and "Ativado!" or "Desativado.", 2)
+    end)
 
-    do
-        local c, lbl = createCard(PlayerFrame, "Noclip: OFF", "Aperte para ativar ou desativar atravessar paredes", 340, COLORS.text, nil)
-        c.MouseButton1Click:Connect(function()
-            noclipOn = not noclipOn
-            lbl.Text = "Noclip: " .. (noclipOn and "ON" or "OFF")
-            Notify("Noclip", noclipOn and "Ativado!" or "Desativado.", 2)
-        end)
-    end
+    createToggleAbilityRow(PlayerFrame, "Noclip", "Atravessar paredes", 340, false, function(active)
+        noclipOn = active
+        Notify("Noclip", active and "Ativado!" or "Desativado.", 2)
+    end)
 
-    createCard(PlayerFrame, "NO FOG", "Remove a neblina do jogo", 398, Color3.fromRGB(110, 175, 255), function()
+    createToggleAbilityRow(PlayerFrame, "ESP Jogadores", "Mostra destaque e distancia dos jogadores", 396, false, function(active)
+        setESPEnabled(active)
+        Notify("ESP", active and "ESP ativado!" or "ESP desativado.", 2)
+    end)
+
+    createCard(PlayerFrame, "NO FOG", "Remove a neblina do jogo", 452, Color3.fromRGB(110, 175, 255), function()
         Lighting.FogEnd = 9e9
         Notify("No Fog", "Neblina removida!", 2)
     end)
 
-    createCard(PlayerFrame, "BRILHO", "Melhora o brilho e a iluminacao do jogo", 454, Color3.fromRGB(220, 130, 255), function()
+    createCard(PlayerFrame, "BRILHO", "Melhora o brilho e a iluminacao do jogo", 508, Color3.fromRGB(220, 130, 255), function()
         Lighting.Brightness = 3.5
         Lighting.ClockTime = 14
         Lighting.Ambient = Color3.fromRGB(170, 170, 170)
