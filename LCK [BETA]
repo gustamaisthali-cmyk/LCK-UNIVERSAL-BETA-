@@ -1,6 +1,8 @@
 -- =====================================================================
--- SUS HUB | v.11.2 - LCK SCRIPT (Versao Limpa Sem Acentos)
+-- 一═デ︻ 🅻🅲🅺 🆄🅽🅸🆅🅴🆁🆂🅰🅻 [🅱🅴🆃🅰] ︻デ═一 (Versao Limpa Sem Acentos)
 -- =====================================================================
+
+local SCRIPT_NAME = "一═デ︻ 🅻🅲🅺 🆄🅽🅸🆅🅴🆁🆂🅰🅻 [🅱🅴🆃🅰] ︻デ═一"
 
 local API_CONFIG = {
     DISCORD_INVITE = "https://discord.gg/STYVn6SJ5",
@@ -11,28 +13,32 @@ local API_CONFIG = {
         Linkvertise = "https://linkvertise.com/exemplo-link-linkvertise",
     },
     VALID_KEYS = {
-        "FREE-X991-AJ89-WH2L-CK72", 
+        "FREE-X991-AJ89-WH2L-CK72",
         "FREE-11G9-W8S6-2B8L-LCK-UNIVERSAL-0"
     }
 }
 
-local Players           = game:GetService("Players")
-local UserInputService  = game:GetService("UserInputService")
-local StarterGui        = game:GetService("StarterGui")
-local RunService        = game:GetService("RunService")
+local Players            = game:GetService("Players")
+local UserInputService   = game:GetService("UserInputService")
+local StarterGui         = game:GetService("StarterGui")
+local RunService         = game:GetService("RunService")
 local MarketplaceService = game:GetService("MarketplaceService")
-local Lighting          = game:GetService("Lighting")
+local Lighting           = game:GetService("Lighting")
 
 local LocalPlayer = Players.LocalPlayer
 
 local PlayerAvatarUrl = "rbxassetid://7072718330"
 pcall(function()
-    PlayerAvatarUrl = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+    PlayerAvatarUrl = Players:GetUserThumbnailAsync(
+        LocalPlayer.UserId,
+        Enum.ThumbnailType.HeadShot,
+        Enum.ThumbnailSize.Size420x420
+    )
 end)
 
 local function Protect(gui)
     pcall(function()
-        if gethui then
+        if typeof(gethui) == "function" then
             gui.Parent = gethui()
         elseif game:GetService("CoreGui"):FindFirstChild("RobloxGui") then
             gui.Parent = game:GetService("CoreGui")
@@ -45,7 +51,7 @@ end
 local function Notify(title, desc, duration)
     pcall(function()
         StarterGui:SetCore("SendNotification", {
-            Title = title or "SUS HUB",
+            Title = title or SCRIPT_NAME,
             Text = desc or "",
             Duration = duration or 4,
         })
@@ -54,14 +60,22 @@ end
 
 local function GetHWID()
     local hwid = "MOBILE-USER-" .. tostring(LocalPlayer.UserId)
-    pcall(function() if gethwid then hwid = gethwid() end end)
-    return tostring(hwid)
+    pcall(function()
+        if typeof(gethwid) == "function" then
+            local fetched = gethwid()
+            if fetched and tostring(fetched) ~= "" then
+                hwid = tostring(fetched)
+            end
+        end
+    end)
+    return hwid
 end
 
 -- =====================================================================
--- SISTEMAS DE TEXTURAS E NOME
+-- SISTEMAS DE TEXTURAS E NOME (ESTILO MINECRAFT)
 -- =====================================================================
 local faces = {"Front", "Back", "Bottom", "Top", "Right", "Left"}
+
 local function applyTextureToPart(part, textureId)
     pcall(function()
         for _, face in ipairs(faces) do
@@ -76,12 +90,18 @@ local function applyTextureToPart(part, textureId)
 end
 
 local minecraftMaterials = {
-    {"Wood", "rbxassetid://3258599312"}, {"WoodPlanks", "rbxassetid://8676581022"},
-    {"Brick", "rbxassetid://8558400252"}, {"Cobblestone", "rbxassetid://5003953441"},
-    {"Concrete", "rbxassetid://7341687607"}, {"DiamondPlate", "rbxassetid://6849247561"},
-    {"Fabric", "rbxassetid://118776397"}, {"Granite", "rbxassetid://4722586771"},
-    {"Grass", "rbxassetid://4722588177"}, {"Ice", "rbxassetid://3823766459"},
-    {"Marble", "rbxassetid://62967586"}, {"Metal", "rbxassetid://62967586"},
+    {"Wood", "rbxassetid://3258599312"},
+    {"WoodPlanks", "rbxassetid://8676581022"},
+    {"Brick", "rbxassetid://8558400252"},
+    {"Cobblestone", "rbxassetid://5003953441"},
+    {"Concrete", "rbxassetid://7341687607"},
+    {"DiamondPlate", "rbxassetid://6849247561"},
+    {"Fabric", "rbxassetid://118776397"},
+    {"Granite", "rbxassetid://4722586771"},
+    {"Grass", "rbxassetid://4722588177"},
+    {"Ice", "rbxassetid://3823766459"},
+    {"Marble", "rbxassetid://62967586"},
+    {"Metal", "rbxassetid://62967586"},
     {"Sand", "rbxassetid://152572215"}
 }
 
@@ -102,11 +122,18 @@ local function runMinecraftTexturing()
 end
 
 local materialTextures = {
-    {"Grass", "rbxassetid://7547167347"}, {"Stone", "rbxassetid://7546651802"},
-    {"Concrete", "rbxassetid://7546653328"}, {"Wood", "rbxassetid://7547190453"},
-    {"Sand", "rbxassetid://7547294684"}, {"Ice", "rbxassetid://7546644642"},
-    {"Marble", "rbxassetid://7547174345"}, {"Metal", "rbxassetid://7547178395"},
-    {"Brick", "rbxassetid://7546648254"}, {"Granite", "rbxassetid://7547164400"}
+    {"Grass", "rbxassetid://7547167347"},
+    {"Rock", "rbxassetid://7546651802"},
+    {"Slate", "rbxassetid://7546651802"},
+    {"Concrete", "rbxassetid://7546653328"},
+    {"Wood", "rbxassetid://7547190453"},
+    {"WoodPlanks", "rbxassetid://7547190453"},
+    {"Sand", "rbxassetid://7547294684"},
+    {"Ice", "rbxassetid://7546644642"},
+    {"Marble", "rbxassetid://7547174345"},
+    {"Metal", "rbxassetid://7547178395"},
+    {"Brick", "rbxassetid://7546648254"},
+    {"Granite", "rbxassetid://7547164400"}
 }
 
 local function runCustomTexturing()
@@ -114,47 +141,67 @@ local function runCustomTexturing()
         for _, part in ipairs(workspace:GetDescendants()) do
             if part:IsA("BasePart") then
                 for _, mat in ipairs(materialTextures) do
-                    applyTextureToPart(part, mat[2])
-                    break
+                    if part.Material.Name == mat[1] then
+                        applyTextureToPart(part, mat[2])
+                        break
+                    end
                 end
             end
         end
     end)
 end
 
-local function applyTextureName(textureId)
+local function applyMinecraftNameTag(char)
     pcall(function()
-        local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-        local head = char:WaitForChild("Head")
-        local oldGui = head:FindFirstChild("CustomNameGui")
-        if oldGui then oldGui:Destroy() end
+        if not char then return end
+        local head = char:FindFirstChild("Head") or char:WaitForChild("Head", 5)
+        if not head then return end
 
-        local billboard = Instance.new("BillboardGui")
-        billboard.Name = "CustomNameGui"
-        billboard.Size = UDim2.new(0, 250, 0, 60)
-        billboard.StudsOffset = Vector3.new(0, 2.5, 0)
-        billboard.AlwaysOnTop = true
-        billboard.Parent = head
+        local oldTag = head:FindFirstChild("SusMCNameTag")
+        if oldTag then oldTag:Destroy() end
 
-        local img = Instance.new("ImageLabel")
-        img.Size = UDim2.fromScale(1, 1)
-        img.BackgroundTransparency = 1
-        img.Image = textureId
-        img.ZIndex = 1
-        img.Parent = billboard
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+        end
 
-        local txt = Instance.new("TextLabel")
-        txt.Size = UDim2.fromScale(1, 1)
-        txt.BackgroundTransparency = 1
-        txt.Text = LocalPlayer.Name
-        txt.TextColor3 = Color3.new(1, 1, 1)
-        txt.TextStrokeTransparency = 0
-        txt.TextScaled = true
-        txt.Font = Enum.Font.GothamBold
-        txt.ZIndex = 2
-        txt.Parent = billboard
+        local bgui = Instance.new("BillboardGui")
+        bgui.Name = "SusMCNameTag"
+        bgui.Size = UDim2.fromOffset(220, 46)
+        bgui.StudsOffset = Vector3.new(0, 2.4, 0)
+        bgui.AlwaysOnTop = true
+        bgui.Parent = head
+
+        local box = Instance.new("Frame")
+        box.Size = UDim2.fromScale(1, 1)
+        box.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+        box.BackgroundTransparency = 0.25
+        box.BorderSizePixel = 2
+        box.BorderColor3 = Color3.fromRGB(90, 220, 90)
+        box.Parent = bgui
+
+        local texOverlay = Instance.new("ImageLabel")
+        texOverlay.Size = UDim2.fromScale(1, 1)
+        texOverlay.BackgroundTransparency = 1
+        texOverlay.Image = "rbxassetid://4722588177"
+        texOverlay.ImageTransparency = 0.55
+        texOverlay.ScaleType = Enum.ScaleType.Tile
+        texOverlay.TileSize = UDim2.fromOffset(24, 24)
+        texOverlay.ZIndex = 1
+        texOverlay.Parent = box
+
+        local nameLabel = Instance.new("TextLabel")
+        nameLabel.Size = UDim2.fromScale(1, 1)
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.Text = LocalPlayer.Name
+        nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        nameLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        nameLabel.TextStrokeTransparency = 0
+        nameLabel.TextScaled = true
+        nameLabel.Font = Enum.Font.Arcade
+        nameLabel.ZIndex = 2
+        nameLabel.Parent = box
     end)
-    Notify("Nome Texturizado", "Textura aplicada no seu nome!", 2)
 end
 
 local function stackTexturesOnCharacter(id1, id2)
@@ -204,12 +251,12 @@ local function LaunchSUSHub(isPremium)
     }
 
     local gui = Instance.new("ScreenGui")
-    gui.Name, gui.ResetOnSpawn, gui.IgnoreGuiInset = "SUSHub_v11", false, true
+    gui.Name, gui.ResetOnSpawn, gui.IgnoreGuiInset = "LCKUniversal_Gui", false, true
     Protect(gui)
 
     local main = Instance.new("Frame")
-    main.Size = UDim2.fromOffset(540, 390)
-    main.Position = UDim2.new(0.5, -270, 0.5, -195)
+    main.Size = UDim2.fromOffset(560, 410)
+    main.Position = UDim2.new(0.5, -280, 0.5, -205)
     main.BackgroundColor3 = COLORS.bg
     main.BorderSizePixel = 0
     main.Parent = gui
@@ -218,7 +265,7 @@ local function LaunchSUSHub(isPremium)
     mainStroke.Color, mainStroke.Thickness, mainStroke.Transparency = COLORS.accent, 1, 0.3
 
     local titleBar = Instance.new("Frame")
-    titleBar.Size, titleBar.BackgroundColor3 = UDim2.new(1, 0, 0, 42), COLORS.panel
+    titleBar.Size, titleBar.BackgroundColor3 = UDim2.new(1, 0, 0, 44), COLORS.panel
     titleBar.BorderSizePixel = 0
     titleBar.Parent = main
     Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 10)
@@ -231,265 +278,303 @@ local function LaunchSUSHub(isPremium)
 
     local statusTitleText = isPremium and " - [PREMIUM]" or " - [FREE]"
     local titleLbl = Instance.new("TextLabel")
-    titleLbl.Size = UDim2.new(1, -220, 1, 0)
-    titleLbl.Position = UDim2.fromOffset(12, 0)
+    titleLbl.Size = UDim2.new(1, -60, 1, 0)
+    titleLbl.Position = UDim2.fromOffset(10, 0)
     titleLbl.BackgroundTransparency = 1
-    titleLbl.Text = "SUS HUB Project NEXT\n" .. gameName .. statusTitleText
-    titleLbl.TextXAlignment, titleLbl.TextColor3 = Enum.TextXAlignment.Left, isPremium and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(255, 160, 60)
-    titleLbl.Font, titleLbl.TextSize = Enum.Font.GothamBold, 11
+    titleLbl.Text = SCRIPT_NAME .. "\n" .. gameName .. statusTitleText
+    titleLbl.TextXAlignment = Enum.TextXAlignment.Left
+    titleLbl.TextColor3 = isPremium and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(255, 160, 60)
+    titleLbl.Font, titleLbl.TextSize = Enum.Font.GothamBold, 10
     titleLbl.Parent = titleBar
 
     local closeBtn = Instance.new("TextButton")
-    closeBtn.Size, closeBtn.Position = UDim2.fromOffset(26, 26), UDim2.new(1, -32, 0.5, -13)
+    closeBtn.Size, closeBtn.Position = UDim2.fromOffset(26, 26), UDim2.new(1, -34, 0.5, -13)
     closeBtn.BackgroundColor3, closeBtn.Text = Color3.fromRGB(80, 30, 30), "X"
     closeBtn.TextColor3, closeBtn.Font, closeBtn.TextSize = Color3.fromRGB(255, 120, 120), Enum.Font.GothamBold, 12
     closeBtn.Parent = titleBar
     Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
 
     local openBtn = Instance.new("TextButton")
-    openBtn.Size = UDim2.fromOffset(110, 34)
-    openBtn.Position = UDim2.new(0, 15, 0.5, -17)
+    openBtn.Size = UDim2.fromOffset(180, 36)
+    openBtn.Position = UDim2.new(0, 15, 0.5, -18)
     openBtn.BackgroundColor3 = COLORS.panel
-    openBtn.Text = "SUS HUB"
+    openBtn.Text = SCRIPT_NAME
     openBtn.TextColor3 = COLORS.accent
-    openBtn.Font, openBtn.TextSize = Enum.Font.GothamBold, 12
+    openBtn.Font, openBtn.TextSize = Enum.Font.GothamBold, 10
     openBtn.Visible = false
     openBtn.Parent = gui
     Instance.new("UICorner", openBtn).CornerRadius = UDim.new(0, 8)
     Instance.new("UIStroke", openBtn).Color = COLORS.accent
 
-    closeBtn.MouseButton1Click:Connect(function() main.Visible = false openBtn.Visible = true end)
-    openBtn.MouseButton1Click:Connect(function() main.Visible = true openBtn.Visible = false end)
-
-    do
-        local dragging, dragStart, startPos
-        titleBar.InputBegan:Connect(function(i)
+    local function makeDraggable(dragHandle, targetFrame, onClickCallback)
+        local dragging, dragStart, startPos, moved = false, nil, nil, false
+        dragHandle.InputBegan:Connect(function(i)
             if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
-                dragging, dragStart, startPos = true, i.Position, main.Position
+                dragging, moved = true, false
+                dragStart, startPos = i.Position, targetFrame.Position
             end
         end)
         UserInputService.InputEnded:Connect(function(i)
-            if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then dragging = false end
+            if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+                if dragging and not moved and onClickCallback then
+                    onClickCallback()
+                end
+                dragging = false
+            end
         end)
         UserInputService.InputChanged:Connect(function(i)
             if not dragging then return end
             if i.UserInputType ~= Enum.UserInputType.MouseMovement and i.UserInputType ~= Enum.UserInputType.Touch then return end
             local d = i.Position - dragStart
-            main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + d.X, startPos.Y.Scale, startPos.Y.Offset + d.Y)
+            if d.Magnitude > 6 then moved = true end
+            targetFrame.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + d.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + d.Y
+            )
         end)
     end
 
+    makeDraggable(titleBar, main, nil)
+    makeDraggable(openBtn, openBtn, function()
+        main.Visible = true
+        openBtn.Visible = false
+    end)
+
+    closeBtn.MouseButton1Click:Connect(function()
+        main.Visible = false
+        openBtn.Visible = true
+    end)
+
     local TabBar = Instance.new("Frame", main)
     TabBar.Size = UDim2.new(1, -20, 0, 32)
-    TabBar.Position = UDim2.fromOffset(10, 48)
+    TabBar.Position = UDim2.fromOffset(10, 50)
     TabBar.BackgroundTransparency = 1
 
-    local function makeTabButton(text, xPos, width)
+    local function makeTabButton(text, xPos, width, locked)
         local btn = Instance.new("TextButton", TabBar)
-        btn.Size = UDim2.fromOffset(width, 26)
+        btn.Size = UDim2.fromOffset(width, 28)
         btn.Position = UDim2.fromOffset(xPos, 0)
-        btn.BackgroundColor3 = Color3.fromRGB(35, 24, 18)
-        btn.Text = text
-        btn.TextColor3 = COLORS.text
+        btn.BackgroundColor3 = locked and Color3.fromRGB(45, 22, 22) or Color3.fromRGB(35, 24, 18)
+        btn.Text = locked and ("🔒 " .. text) or text
+        btn.TextColor3 = locked and Color3.fromRGB(255, 130, 130) or COLORS.text
         btn.Font = Enum.Font.GothamBold
-        btn.TextSize = 11
+        btn.TextSize = 10
         Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-        Instance.new("UIStroke", btn).Color = Color3.fromRGB(80, 50, 35)
+        Instance.new("UIStroke", btn).Color = locked and Color3.fromRGB(220, 70, 70) or Color3.fromRGB(80, 50, 35)
         return btn
     end
 
-    local MainTabBtn = makeTabButton("Main", 0, 70)
-    local InfoTabBtn = makeTabButton("Info", 75, 70)
-    local TexturaTabBtn = makeTabButton("Texturas", 150, 80)
-    local PlayerTabBtn = makeTabButton("Jogador", 235, 80)
+    local MainTabBtn    = makeTabButton("Main", 0, 68, false)
+    local InfoTabBtn    = makeTabButton("Info", 73, 68, false)
+    local TexturaTabBtn = makeTabButton("Texturas", 146, 82, false)
+    local PlayerTabBtn  = makeTabButton("Jogador", 233, 82, false)
+    local PremiumTabBtn = makeTabButton("Premium", 320, 105, not isPremium)
 
     local ContentArea = Instance.new("Frame", main)
     ContentArea.Size = UDim2.new(1, -20, 1, -92)
-    ContentArea.Position = UDim2.fromOffset(10, 82)
+    ContentArea.Position = UDim2.fromOffset(10, 84)
     ContentArea.BackgroundTransparency = 1
 
-    -- MAIN
-    local MainFrame = Instance.new("Frame", ContentArea)
+    -- ABA 1: MAIN
+    local MainFrame = Instance.new("ScrollingFrame", ContentArea)
     MainFrame.Size = UDim2.fromScale(1, 1)
     MainFrame.BackgroundTransparency = 1
+    MainFrame.ScrollBarThickness = 4
+    MainFrame.CanvasSize = UDim2.fromOffset(0, 360)
     MainFrame.Visible = true
 
-    local LeftPanel = Instance.new("Frame", MainFrame)
-    LeftPanel.Size = UDim2.fromOffset(250, 288)
-    LeftPanel.BackgroundColor3 = COLORS.panel
-    Instance.new("UICorner", LeftPanel).CornerRadius = UDim.new(0, 8)
-    Instance.new("UIStroke", LeftPanel).Color = COLORS.accent
+    local UserCard = Instance.new("Frame", MainFrame)
+    UserCard.Size = UDim2.fromOffset(524, 72)
+    UserCard.Position = UDim2.fromOffset(4, 4)
+    UserCard.BackgroundColor3 = COLORS.panel
+    Instance.new("UICorner", UserCard).CornerRadius = UDim.new(0, 8)
+    Instance.new("UIStroke", UserCard).Color = COLORS.accent
 
-    local UserInfoTitle = Instance.new("TextLabel", LeftPanel)
-    UserInfoTitle.Size, UserInfoTitle.Position = UDim2.new(1, -16, 0, 18), UDim2.fromOffset(10, 8)
-    UserInfoTitle.BackgroundTransparency = 1
-    UserInfoTitle.Text, UserInfoTitle.TextColor3 = "USER INFO", COLORS.accent
-    UserInfoTitle.Font, UserInfoTitle.TextSize = Enum.Font.GothamBold, 10
-    UserInfoTitle.TextXAlignment = Enum.TextXAlignment.Left
-
-    local CustomAvatarImg = Instance.new("ImageLabel", LeftPanel)
-    CustomAvatarImg.Size, CustomAvatarImg.Position = UDim2.fromOffset(40, 40), UDim2.fromOffset(10, 30)
+    local CustomAvatarImg = Instance.new("ImageLabel", UserCard)
+    CustomAvatarImg.Size, CustomAvatarImg.Position = UDim2.fromOffset(48, 48), UDim2.fromOffset(12, 12)
     CustomAvatarImg.BackgroundColor3 = COLORS.bg
     CustomAvatarImg.Image = PlayerAvatarUrl
     Instance.new("UICorner", CustomAvatarImg).CornerRadius = UDim.new(1, 0)
     Instance.new("UIStroke", CustomAvatarImg).Color = COLORS.accent
 
-    local UserDetails = Instance.new("TextLabel", LeftPanel)
-    UserDetails.Size, UserDetails.Position = UDim2.new(1, -60, 0, 40), UDim2.fromOffset(58, 32)
+    local UserDetails = Instance.new("TextLabel", UserCard)
+    UserDetails.Size, UserDetails.Position = UDim2.new(1, -76, 1, -12), UDim2.fromOffset(68, 6)
     UserDetails.BackgroundTransparency = 1
-    UserDetails.Text = LocalPlayer.Name .. "\n@" .. LocalPlayer.Name .. "\nHWID: " .. GetHWID():sub(1, 10) .. "..."
+    UserDetails.Text = LocalPlayer.Name .. " (@" .. LocalPlayer.Name .. ")\nHWID: " .. GetHWID():sub(1, 16) .. "..."
     UserDetails.TextColor3 = COLORS.text
-    UserDetails.Font, UserDetails.TextSize = Enum.Font.GothamBold, 10
+    UserDetails.Font, UserDetails.TextSize = Enum.Font.GothamBold, 11
     UserDetails.TextXAlignment = Enum.TextXAlignment.Left
 
-    local RightPanel = Instance.new("Frame", MainFrame)
-    RightPanel.Size = UDim2.fromOffset(260, 288)
-    RightPanel.Position = UDim2.fromOffset(260, 0)
-    RightPanel.BackgroundColor3 = COLORS.panel
-    Instance.new("UICorner", RightPanel).CornerRadius = UDim.new(0, 8)
-    Instance.new("UIStroke", RightPanel).Color = COLORS.accent
-
-    local function makeShortcutRow(title, desc, yPos, callback)
-        local btn = Instance.new("TextButton", RightPanel)
-        btn.Size, btn.Position = UDim2.fromOffset(240, 44), UDim2.fromOffset(10, yPos)
-        btn.BackgroundColor3 = Color3.fromRGB(20, 14, 10)
+    local function makeMainRow(title, desc, yPos, callback)
+        local btn = Instance.new("TextButton", MainFrame)
+        btn.Size, btn.Position = UDim2.fromOffset(524, 46), UDim2.fromOffset(4, yPos)
+        btn.BackgroundColor3 = COLORS.panel
         btn.Text = ""
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-        Instance.new("UIStroke", btn).Color = Color3.fromRGB(60, 40, 30)
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+        Instance.new("UIStroke", btn).Color = Color3.fromRGB(70, 45, 30)
+
         local tLbl = Instance.new("TextLabel", btn)
-        tLbl.Size, tLbl.Position = UDim2.new(1, -12, 0, 20), UDim2.fromOffset(8, 4)
+        tLbl.Size, tLbl.Position = UDim2.new(1, -16, 0, 20), UDim2.fromOffset(10, 4)
         tLbl.BackgroundTransparency = 1
         tLbl.Text, tLbl.TextColor3 = "* " .. title, COLORS.text
         tLbl.Font, tLbl.TextSize = Enum.Font.GothamBold, 11
         tLbl.TextXAlignment = Enum.TextXAlignment.Left
+
         local dLbl = Instance.new("TextLabel", btn)
-        dLbl.Size, dLbl.Position = UDim2.new(1, -12, 0, 16), UDim2.fromOffset(8, 22)
+        dLbl.Size, dLbl.Position = UDim2.new(1, -16, 0, 16), UDim2.fromOffset(10, 24)
         dLbl.BackgroundTransparency = 1
         dLbl.Text, dLbl.TextColor3 = desc, COLORS.dim
         dLbl.Font, dLbl.TextSize = Enum.Font.Gotham, 9
         dLbl.TextXAlignment = Enum.TextXAlignment.Left
+
         btn.MouseButton1Click:Connect(callback)
     end
 
-    makeShortcutRow("Discord", "Copiar link do Discord", 34, function() pcall(function() setclipboard(API_CONFIG.DISCORD_INVITE) end) Notify("Copiado", "Discord copiado!") end)
-    makeShortcutRow("YouTube", "Copiar canal @LCK_SCRIPT", 86, function() pcall(function() setclipboard(API_CONFIG.YOUTUBE_URL) end) Notify("Copiado", "YouTube copiado!") end)
-    makeShortcutRow("Instagram", "Copiar Instagram oficial", 138, function() pcall(function() setclipboard(API_CONFIG.INSTAGRAM_URL) end) Notify("Copiado", "Instagram copiado!") end)
+    makeMainRow("Discord", "Copiar link do Discord", 84, function()
+        pcall(function() setclipboard(API_CONFIG.DISCORD_INVITE) end)
+        Notify("Copiado", "Discord copiado!")
+    end)
 
-    -- INFO
-    local InfoFrame = Instance.new("Frame", ContentArea)
-    InfoFrame.Size, InfoFrame.BackgroundTransparency = UDim2.fromScale(1, 1), 1
+    makeMainRow("YouTube", "Copiar canal @LCK_SCRIPT", 136, function()
+        pcall(function() setclipboard(API_CONFIG.YOUTUBE_URL) end)
+        Notify("Copiado", "YouTube copiado!")
+    end)
+
+    makeMainRow("Instagram", "Copiar Instagram oficial", 188, function()
+        pcall(function() setclipboard(API_CONFIG.INSTAGRAM_URL) end)
+        Notify("Copiado", "Instagram copiado!")
+    end)
+
+    -- ABA 2: INFO
+    local InfoFrame = Instance.new("ScrollingFrame", ContentArea)
+    InfoFrame.Size = UDim2.fromScale(1, 1)
+    InfoFrame.BackgroundTransparency = 1
+    InfoFrame.ScrollBarThickness = 4
+    InfoFrame.CanvasSize = UDim2.fromOffset(0, 220)
     InfoFrame.Visible = false
 
-    local InfoPanel = Instance.new("Frame", InfoFrame)
-    InfoPanel.Size = UDim2.fromOffset(520, 288)
-    InfoPanel.BackgroundColor3 = COLORS.panel
-    Instance.new("UICorner", InfoPanel).CornerRadius = UDim.new(0, 8)
-    Instance.new("UIStroke", InfoPanel).Color = COLORS.accent
-
-    local InfoHeader = Instance.new("TextLabel", InfoPanel)
-    InfoHeader.Size, InfoHeader.Position = UDim2.new(1, -16, 0, 22), UDim2.fromOffset(12, 12)
-    InfoHeader.BackgroundTransparency = 1
-    InfoHeader.Text, InfoHeader.TextColor3 = "CENTRAL DE INFORMACOES", COLORS.accent
-    InfoHeader.Font, InfoHeader.TextSize = Enum.Font.GothamBold, 11
-    InfoHeader.TextXAlignment = Enum.TextXAlignment.Left
-
-    local function makeExtraButton(title, desc, yPos, callback)
-        local btn = Instance.new("TextButton", InfoPanel)
-        btn.Size, btn.Position = UDim2.fromOffset(496, 42), UDim2.fromOffset(12, yPos)
-        btn.BackgroundColor3 = Color3.fromRGB(20, 14, 10)
+    local function makeInfoRow(title, desc, yPos, callback)
+        local btn = Instance.new("TextButton", InfoFrame)
+        btn.Size, btn.Position = UDim2.fromOffset(524, 48), UDim2.fromOffset(4, yPos)
+        btn.BackgroundColor3 = COLORS.panel
         btn.Text = ""
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-        Instance.new("UIStroke", btn).Color = Color3.fromRGB(80, 50, 35)
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+        Instance.new("UIStroke", btn).Color = COLORS.accent
+
         local tLbl = Instance.new("TextLabel", btn)
-        tLbl.Size, tLbl.Position = UDim2.new(1, -12, 0, 20), UDim2.fromOffset(10, 4)
+        tLbl.Size, tLbl.Position = UDim2.new(1, -16, 0, 20), UDim2.fromOffset(10, 5)
         tLbl.BackgroundTransparency = 1
         tLbl.Text, tLbl.TextColor3 = "> " .. title, COLORS.accent
         tLbl.Font, tLbl.TextSize = Enum.Font.GothamBold, 11
         tLbl.TextXAlignment = Enum.TextXAlignment.Left
+
         local dLbl = Instance.new("TextLabel", btn)
-        dLbl.Size, dLbl.Position = UDim2.new(1, -12, 0, 16), UDim2.fromOffset(10, 22)
+        dLbl.Size, dLbl.Position = UDim2.new(1, -16, 0, 16), UDim2.fromOffset(10, 25)
         dLbl.BackgroundTransparency = 1
         dLbl.Text, dLbl.TextColor3 = desc, COLORS.dim
         dLbl.Font, dLbl.TextSize = Enum.Font.Gotham, 9
         dLbl.TextXAlignment = Enum.TextXAlignment.Left
+
         btn.MouseButton1Click:Connect(callback)
     end
 
-    makeExtraButton("LCK HUB PIGGY 1.60", "Executar script para Piggy", 45, function()
+    makeInfoRow("LCK HUB PIGGY 1.60", "Executar script para Piggy", 6, function()
         Notify("Carregando...", "Executando LCK HUB PIGGY", 2)
         pcall(function() loadstring(game:HttpGet("https://pastefy.app/ck27ob4i/raw"))() end)
     end)
-    makeExtraButton("redzlib v5 UI Library", "Carregar interface redzlib", 95, function()
+
+    makeInfoRow("redzlib v5 UI Library", "Carregar interface redzlib", 62, function()
         Notify("Carregando...", "Executando redzlib v5", 2)
         pcall(function() loadstring(game:HttpGet("https://pastefy.app/SglyCstp/raw"))() end)
     end)
 
-    -- TEXTURAS
-    local TexturaFrame = Instance.new("Frame", ContentArea)
-    TexturaFrame.Size, TexturaFrame.BackgroundTransparency = UDim2.fromScale(1, 1), 1
+    -- ABA 3: TEXTURAS
+    local TexturaFrame = Instance.new("ScrollingFrame", ContentArea)
+    TexturaFrame.Size = UDim2.fromScale(1, 1)
+    TexturaFrame.BackgroundTransparency = 1
+    TexturaFrame.ScrollBarThickness = 4
+    TexturaFrame.CanvasSize = UDim2.fromOffset(0, 260)
     TexturaFrame.Visible = false
 
-    local TexturaPanel = Instance.new("Frame", TexturaFrame)
-    TexturaPanel.Size = UDim2.fromOffset(520, 288)
-    TexturaPanel.BackgroundColor3 = COLORS.panel
-    Instance.new("UICorner", TexturaPanel).CornerRadius = UDim.new(0, 8)
-    Instance.new("UIStroke", TexturaPanel).Color = COLORS.accent
+    local mcNameEnabled = false
+    LocalPlayer.CharacterAdded:Connect(function(char)
+        if mcNameEnabled then
+            task.wait(0.25)
+            applyMinecraftNameTag(char)
+        end
+    end)
 
-    local TexHeader = Instance.new("TextLabel", TexturaPanel)
-    TexHeader.Size, TexHeader.Position = UDim2.new(1, -16, 0, 22), UDim2.fromOffset(12, 8)
-    TexHeader.BackgroundTransparency = 1
-    TexHeader.Text, TexHeader.TextColor3 = "GERENCIADOR DE TEXTURAS", COLORS.accent
-    TexHeader.Font, TexHeader.TextSize = Enum.Font.GothamBold, 11
-    TexHeader.TextXAlignment = Enum.TextXAlignment.Left
-
-    local function makeTexButton(title, yPos, color, callback)
-        local btn = Instance.new("TextButton", TexturaPanel)
-        btn.Size, btn.Position = UDim2.fromOffset(496, 36), UDim2.fromOffset(12, yPos)
-        btn.BackgroundColor3 = Color3.fromRGB(20, 14, 10)
+    local function makeTexRow(title, desc, yPos, color, callback)
+        local btn = Instance.new("TextButton", TexturaFrame)
+        btn.Size, btn.Position = UDim2.fromOffset(524, 48), UDim2.fromOffset(4, yPos)
+        btn.BackgroundColor3 = COLORS.panel
         btn.Text = ""
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
         Instance.new("UIStroke", btn).Color = color
-        local lbl = Instance.new("TextLabel", btn)
-        lbl.Size, lbl.Position = UDim2.new(1, -12, 0, 36), UDim2.fromOffset(10, 0)
-        lbl.BackgroundTransparency = 1
-        lbl.Text, lbl.TextColor3 = title, color
-        lbl.Font, lbl.TextSize = Enum.Font.GothamBold, 11
-        lbl.TextXAlignment = Enum.TextXAlignment.Left
+
+        local tLbl = Instance.new("TextLabel", btn)
+        tLbl.Size, tLbl.Position = UDim2.new(1, -16, 0, 20), UDim2.fromOffset(10, 5)
+        tLbl.BackgroundTransparency = 1
+        tLbl.Text, tLbl.TextColor3 = title, color
+        tLbl.Font, tLbl.TextSize = Enum.Font.GothamBold, 11
+        tLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+        local dLbl = Instance.new("TextLabel", btn)
+        dLbl.Size, dLbl.Position = UDim2.new(1, -16, 0, 16), UDim2.fromOffset(10, 25)
+        dLbl.BackgroundTransparency = 1
+        dLbl.Text, dLbl.TextColor3 = desc, COLORS.dim
+        dLbl.Font, dLbl.TextSize = Enum.Font.Gotham, 9
+        dLbl.TextXAlignment = Enum.TextXAlignment.Left
+
         btn.MouseButton1Click:Connect(callback)
     end
 
-    makeTexButton("Textura Minecraft no Mapa (FREE)", 35, Color3.fromRGB(0, 255, 100), function()
-        Notify("Textura", "Aplicando texturas...", 2) runMinecraftTexturing()
+    makeTexRow("Textura Minecraft no Mapa (FREE)", "Aplica blocos estilo Minecraft no mapa", 6, Color3.fromRGB(0, 255, 100), function()
+        Notify("Textura", "Aplicando texturas...", 2)
+        runMinecraftTexturing()
     end)
-    makeTexButton((isPremium and "Liberado: " or "Bloqueado: ") .. "Texturas Reais no Mapa", 78, isPremium and COLORS.accent or Color3.fromRGB(255, 100, 100), function()
-        if isPremium then Notify("Textura", "Aplicando...", 2) runCustomTexturing() else Notify("Bloqueado", "Requer Premium!", 3) end
+
+    makeTexRow("Nome Estilo Minecraft", "Mantem seu nome e aplica estilo Minecraft/Arcade", 62, Color3.fromRGB(85, 255, 85), function()
+        mcNameEnabled = not mcNameEnabled
+        if mcNameEnabled then
+            applyMinecraftNameTag(LocalPlayer.Character)
+            Notify("Nome Minecraft", "Textura estilo Minecraft ativada no nome!", 2)
+        else
+            local head = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head")
+            local old = head and head:FindFirstChild("SusMCNameTag")
+            if old then old:Destroy() end
+            local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer
+            end
+            Notify("Nome Minecraft", "Textura removida do nome.", 2)
+        end
     end)
-    makeTexButton("Colocar Textura no Nome", 121, Color3.fromRGB(0, 150, 255), function()
-        applyTextureName("rbxassetid://7547167347")
-    end)
-    makeTexButton("Empilhar Texturas no Personagem", 164, Color3.fromRGB(255, 50, 150), function()
+
+    makeTexRow("Empilhar Texturas no Personagem", "Aplica duas camadas de textura no personagem", 118, Color3.fromRGB(255, 50, 150), function()
         stackTexturesOnCharacter("rbxassetid://7546651802", "rbxassetid://7547167347")
     end)
 
-    -- JOGADOR
-    local PlayerFrame = Instance.new("Frame", ContentArea)
-    PlayerFrame.Size, PlayerFrame.BackgroundTransparency = UDim2.fromScale(1, 1), 1
+    -- ABA 4: JOGADOR
+    local PlayerFrame = Instance.new("ScrollingFrame", ContentArea)
+    PlayerFrame.Size = UDim2.fromScale(1, 1)
+    PlayerFrame.BackgroundTransparency = 1
+    PlayerFrame.ScrollBarThickness = 4
+    PlayerFrame.CanvasSize = UDim2.fromOffset(0, 560)
     PlayerFrame.Visible = false
-
-    local PlayerPanel = Instance.new("Frame", PlayerFrame)
-    PlayerPanel.Size = UDim2.fromOffset(520, 288)
-    PlayerPanel.BackgroundColor3 = COLORS.panel
-    Instance.new("UICorner", PlayerPanel).CornerRadius = UDim.new(0, 8)
-    Instance.new("UIStroke", PlayerPanel).Color = COLORS.accent
 
     local noclip = false
     local infJump = false
     local flying = false
-    local flySpeed = 50
+    local flySpeed = 60
+    local jumpForce = 80
+    local walkSpeedVal = 24
 
     RunService.Stepped:Connect(function()
         if noclip and LocalPlayer.Character then
-            for _, v in pairs(LocalPlayer.Character:GetDescendants()) do
+            for _, v in ipairs(LocalPlayer.Character:GetDescendants()) do
                 if v:IsA("BasePart") and v.CanCollide then
                     v.CanCollide = false
                 end
@@ -499,123 +584,255 @@ local function LaunchSUSHub(isPremium)
 
     UserInputService.JumpRequest:Connect(function()
         if infJump and LocalPlayer.Character then
-            local hum = LocalPlayer.Character:FindFirstChild("Humanoid")
-            if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
+            local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if hum then
+                hum.UseJumpPower = true
+                hum.JumpPower = jumpForce
+                hum:ChangeState(Enum.HumanoidStateType.Jumping)
+                if hrp then
+                    local boostY = math.clamp(jumpForce * 0.75, 45, 220)
+                    hrp.AssemblyLinearVelocity = Vector3.new(hrp.AssemblyLinearVelocity.X, boostY, hrp.AssemblyLinearVelocity.Z)
+                end
+            end
         end
     end)
 
-    local function toggleFly()
-        flying = not flying
+    local function toggleFly(forceState)
+        flying = (forceState ~= nil) and forceState or (not flying)
         local char = LocalPlayer.Character
         if not char then return end
         local hrp = char:FindFirstChild("HumanoidRootPart")
-        local hum = char:FindFirstChild("Humanoid")
-        
+        local hum = char:FindFirstChildOfClass("Humanoid")
+
         if flying then
-            local bg = Instance.new("BodyGyro", hrp)
+            if not hrp or not hum then
+                flying = false
+                return
+            end
+
+            local oldBg = hrp:FindFirstChild("FlyGyro")
+            if oldBg then oldBg:Destroy() end
+            local oldBv = hrp:FindFirstChild("FlyVel")
+            if oldBv then oldBv:Destroy() end
+
+            local bg = Instance.new("BodyGyro")
             bg.Name = "FlyGyro"
             bg.P = 9e4
-            bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-            bg.cframe = hrp.CFrame
-            
-            local bv = Instance.new("BodyVelocity", hrp)
+            bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+            bg.CFrame = hrp.CFrame
+            bg.Parent = hrp
+
+            local bv = Instance.new("BodyVelocity")
             bv.Name = "FlyVel"
-            bv.velocity = Vector3.new(0,0,0)
-            bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
-            
+            bv.Velocity = Vector3.zero
+            bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+            bv.Parent = hrp
+
             hum.PlatformStand = true
         else
-            local bg = hrp:FindFirstChild("FlyGyro")
-            local bv = hrp:FindFirstChild("FlyVel")
-            if bg then bg:Destroy() end
-            if bv then bv:Destroy() end
-            hum.PlatformStand = false
+            if hrp then
+                local bg = hrp:FindFirstChild("FlyGyro")
+                local bv = hrp:FindFirstChild("FlyVel")
+                if bg then bg:Destroy() end
+                if bv then bv:Destroy() end
+            end
+            if hum then
+                hum.PlatformStand = false
+            end
         end
     end
 
     RunService.RenderStepped:Connect(function()
         if flying and LocalPlayer.Character then
             local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
             local bv = hrp and hrp:FindFirstChild("FlyVel")
-            if bv then
-                local cam = workspace.CurrentCamera
-                local moveDir = LocalPlayer.Character.Humanoid.MoveDirection
+            local bg = hrp and hrp:FindFirstChild("FlyGyro")
+            local cam = workspace.CurrentCamera
+
+            if hrp and hum and bv and cam then
+                local moveDir = hum.MoveDirection
                 local flyDir = cam.CFrame:VectorToWorldSpace(Vector3.new(moveDir.X, 0, moveDir.Z))
-                
+
                 if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-                    flyDir = flyDir + Vector3.new(0, 1, 0)
+                    flyDir += Vector3.new(0, 1, 0)
+                elseif UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                    flyDir -= Vector3.new(0, 1, 0)
                 end
-                
+
                 bv.Velocity = flyDir * flySpeed
+                if bg then
+                    bg.CFrame = cam.CFrame
+                end
             end
         end
     end)
 
-    local function makeInputBox(title, defaultText, yPos, btnText, btnColor, callback)
-        local lbl = Instance.new("TextLabel", PlayerPanel)
-        lbl.Size, lbl.Position = UDim2.fromOffset(150, 20), UDim2.fromOffset(15, yPos)
+    local function makeRowContainer(yPos, height)
+        local row = Instance.new("Frame", PlayerFrame)
+        row.Size = UDim2.fromOffset(524, height or 44)
+        row.Position = UDim2.fromOffset(4, yPos)
+        row.BackgroundColor3 = COLORS.panel
+        Instance.new("UICorner", row).CornerRadius = UDim.new(0, 8)
+        Instance.new("UIStroke", row).Color = Color3.fromRGB(70, 45, 30)
+        return row
+    end
+
+    do
+        local row = makeRowContainer(6, 44)
+        local lbl = Instance.new("TextLabel", row)
+        lbl.Size, lbl.Position = UDim2.fromOffset(145, 32), UDim2.fromOffset(10, 6)
         lbl.BackgroundTransparency = 1
-        lbl.Text, lbl.TextColor3 = title, COLORS.text
+        lbl.Text, lbl.TextColor3 = "Speed (Velocidade)", COLORS.text
         lbl.Font, lbl.TextSize = Enum.Font.GothamBold, 11
         lbl.TextXAlignment = Enum.TextXAlignment.Left
 
-        local bg = Instance.new("Frame", PlayerPanel)
-        bg.Size, bg.Position = UDim2.fromOffset(100, 24), UDim2.fromOffset(170, yPos)
-        bg.BackgroundColor3 = Color3.fromRGB(15, 10, 8)
-        Instance.new("UICorner", bg).CornerRadius = UDim.new(0, 4)
-        Instance.new("UIStroke", bg).Color = Color3.fromRGB(80, 50, 35)
+        local box = Instance.new("TextBox", row)
+        box.Size, box.Position = UDim2.fromOffset(78, 28), UDim2.fromOffset(162, 8)
+        box.BackgroundColor3 = Color3.fromRGB(15, 10, 8)
+        box.Text, box.TextColor3 = tostring(walkSpeedVal), COLORS.text
+        box.Font, box.TextSize = Enum.Font.GothamBold, 11
+        box.ClearTextOnFocus = false
+        Instance.new("UICorner", box).CornerRadius = UDim.new(0, 5)
 
-        local box = Instance.new("TextBox", bg)
-        box.Size, box.Position = UDim2.new(1, -10, 1, 0), UDim2.fromOffset(5, 0)
-        box.BackgroundTransparency = 1
-        box.Text, box.TextColor3 = defaultText, COLORS.text
-        box.Font, box.TextSize = Enum.Font.Gotham, 11
+        local applyBtn = Instance.new("TextButton", row)
+        applyBtn.Size, applyBtn.Position = UDim2.fromOffset(76, 28), UDim2.fromOffset(248, 8)
+        applyBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+        applyBtn.Text, applyBtn.TextColor3 = "Aplicar", Color3.fromRGB(15, 12, 10)
+        applyBtn.Font, applyBtn.TextSize = Enum.Font.GothamBold, 10
+        Instance.new("UICorner", applyBtn).CornerRadius = UDim.new(0, 5)
 
-        local btn = Instance.new("TextButton", PlayerPanel)
-        btn.Size, btn.Position = UDim2.fromOffset(80, 24), UDim2.fromOffset(280, yPos)
-        btn.BackgroundColor3 = btnColor
-        btn.Text, btn.TextColor3 = btnText, Color3.fromRGB(20, 14, 10)
-        btn.Font, btn.TextSize = Enum.Font.GothamBold, 10
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
+        local addBtn = Instance.new("TextButton", row)
+        addBtn.Size, addBtn.Position = UDim2.fromOffset(82, 28), UDim2.fromOffset(332, 8)
+        addBtn.BackgroundColor3 = COLORS.accent
+        addBtn.Text, addBtn.TextColor3 = "+15 Speed", Color3.fromRGB(15, 12, 10)
+        addBtn.Font, addBtn.TextSize = Enum.Font.GothamBold, 10
+        Instance.new("UICorner", addBtn).CornerRadius = UDim.new(0, 5)
 
-        btn.MouseButton1Click:Connect(function()
-            callback(box.Text)
+        local function setSpeed(n)
+            walkSpeedVal = math.max(1, n)
+            box.Text = tostring(walkSpeedVal)
+            local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if hum then hum.WalkSpeed = walkSpeedVal end
+            Notify("Speed", "Velocidade: " .. walkSpeedVal, 2)
+        end
+
+        applyBtn.MouseButton1Click:Connect(function()
+            local n = tonumber(box.Text)
+            if n then setSpeed(n) end
+        end)
+        addBtn.MouseButton1Click:Connect(function()
+            setSpeed(walkSpeedVal + 15)
         end)
     end
 
-    makeInputBox("Velocidade (Speed)", "16", 40, "Aplicar", Color3.fromRGB(0, 200, 100), function(val)
-        local num = tonumber(val)
-        if num and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-            LocalPlayer.Character.Humanoid.WalkSpeed = num
-            Notify("Speed", "Velocidade alterada para " .. num, 2)
-        end
-    end)
+    do
+        local row = makeRowContainer(56, 44)
+        local lbl = Instance.new("TextLabel", row)
+        lbl.Size, lbl.Position = UDim2.fromOffset(145, 32), UDim2.fromOffset(10, 6)
+        lbl.BackgroundTransparency = 1
+        lbl.Text, lbl.TextColor3 = "Forca do Pulo", COLORS.text
+        lbl.Font, lbl.TextSize = Enum.Font.GothamBold, 11
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
 
-    makeInputBox("Forca do Pulo (Jump)", "50", 75, "Aplicar", Color3.fromRGB(0, 200, 100), function(val)
-        local num = tonumber(val)
-        if num and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-            LocalPlayer.Character.Humanoid.JumpPower = num
-            LocalPlayer.Character.Humanoid.UseJumpPower = true
-            Notify("Jump", "Pulo alterado para " .. num, 2)
-        end
-    end)
+        local box = Instance.new("TextBox", row)
+        box.Size, box.Position = UDim2.fromOffset(78, 28), UDim2.fromOffset(162, 8)
+        box.BackgroundColor3 = Color3.fromRGB(15, 10, 8)
+        box.Text, box.TextColor3 = tostring(jumpForce), COLORS.text
+        box.Font, box.TextSize = Enum.Font.GothamBold, 11
+        box.ClearTextOnFocus = false
+        Instance.new("UICorner", box).CornerRadius = UDim.new(0, 5)
 
-    makeInputBox("Velocidade do Fly", "50", 110, "Aplicar", Color3.fromRGB(0, 200, 100), function(val)
-        local num = tonumber(val)
-        if num then
-            flySpeed = num
-            Notify("Fly", "Velocidade do Fly: " .. num, 2)
-        end
-    end)
+        local applyBtn = Instance.new("TextButton", row)
+        applyBtn.Size, applyBtn.Position = UDim2.fromOffset(76, 28), UDim2.fromOffset(248, 8)
+        applyBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+        applyBtn.Text, applyBtn.TextColor3 = "Aplicar", Color3.fromRGB(15, 12, 10)
+        applyBtn.Font, applyBtn.TextSize = Enum.Font.GothamBold, 10
+        Instance.new("UICorner", applyBtn).CornerRadius = UDim.new(0, 5)
 
-    local function makeToggle(title, yPos, callback)
-        local btn = Instance.new("TextButton", PlayerPanel)
-        btn.Size, btn.Position = UDim2.fromOffset(345, 26), UDim2.fromOffset(15, yPos)
-        btn.BackgroundColor3 = Color3.fromRGB(35, 24, 18)
+        local addBtn = Instance.new("TextButton", row)
+        addBtn.Size, addBtn.Position = UDim2.fromOffset(82, 28), UDim2.fromOffset(332, 8)
+        addBtn.BackgroundColor3 = COLORS.accent
+        addBtn.Text, addBtn.TextColor3 = "+25 Pulo", Color3.fromRGB(15, 12, 10)
+        addBtn.Font, addBtn.TextSize = Enum.Font.GothamBold, 10
+        Instance.new("UICorner", addBtn).CornerRadius = UDim.new(0, 5)
+
+        local function setJump(n)
+            jumpForce = math.max(10, n)
+            box.Text = tostring(jumpForce)
+            local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.UseJumpPower = true
+                hum.JumpPower = jumpForce
+            end
+            Notify("Forca do Pulo", "Forca ajustada para " .. jumpForce, 2)
+        end
+
+        applyBtn.MouseButton1Click:Connect(function()
+            local n = tonumber(box.Text)
+            if n then setJump(n) end
+        end)
+        addBtn.MouseButton1Click:Connect(function()
+            setJump(jumpForce + 25)
+        end)
+    end
+
+    do
+        local row = makeRowContainer(106, 44)
+        local lbl = Instance.new("TextLabel", row)
+        lbl.Size, lbl.Position = UDim2.fromOffset(145, 32), UDim2.fromOffset(10, 6)
+        lbl.BackgroundTransparency = 1
+        lbl.Text, lbl.TextColor3 = "Velocidade do Fly", COLORS.text
+        lbl.Font, lbl.TextSize = Enum.Font.GothamBold, 11
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+
+        local box = Instance.new("TextBox", row)
+        box.Size, box.Position = UDim2.fromOffset(78, 28), UDim2.fromOffset(162, 8)
+        box.BackgroundColor3 = Color3.fromRGB(15, 10, 8)
+        box.Text, box.TextColor3 = tostring(flySpeed), COLORS.text
+        box.Font, box.TextSize = Enum.Font.GothamBold, 11
+        box.ClearTextOnFocus = false
+        Instance.new("UICorner", box).CornerRadius = UDim.new(0, 5)
+
+        local applyBtn = Instance.new("TextButton", row)
+        applyBtn.Size, applyBtn.Position = UDim2.fromOffset(76, 28), UDim2.fromOffset(248, 8)
+        applyBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+        applyBtn.Text, applyBtn.TextColor3 = "Aplicar", Color3.fromRGB(15, 12, 10)
+        applyBtn.Font, applyBtn.TextSize = Enum.Font.GothamBold, 10
+        Instance.new("UICorner", applyBtn).CornerRadius = UDim.new(0, 5)
+
+        local addBtn = Instance.new("TextButton", row)
+        addBtn.Size, addBtn.Position = UDim2.fromOffset(82, 28), UDim2.fromOffset(332, 8)
+        addBtn.BackgroundColor3 = COLORS.accent
+        addBtn.Text, addBtn.TextColor3 = "+20 Fly", Color3.fromRGB(15, 12, 10)
+        addBtn.Font, addBtn.TextSize = Enum.Font.GothamBold, 10
+        Instance.new("UICorner", addBtn).CornerRadius = UDim.new(0, 5)
+
+        local function setFlySpeed(n)
+            flySpeed = math.max(5, n)
+            box.Text = tostring(flySpeed)
+            Notify("Fly", "Velocidade do Fly: " .. flySpeed, 2)
+        end
+
+        applyBtn.MouseButton1Click:Connect(function()
+            local n = tonumber(box.Text)
+            if n then setFlySpeed(n) end
+        end)
+        addBtn.MouseButton1Click:Connect(function()
+            setFlySpeed(flySpeed + 20)
+        end)
+    end
+
+    local function makeToggleRow(title, yPos, callback)
+        local btn = Instance.new("TextButton", PlayerFrame)
+        btn.Size, btn.Position = UDim2.fromOffset(524, 42), UDim2.fromOffset(4, yPos)
+        btn.BackgroundColor3 = COLORS.panel
         btn.Text, btn.TextColor3 = "OFF: " .. title, COLORS.text
         btn.Font, btn.TextSize = Enum.Font.GothamBold, 11
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
-        
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+        Instance.new("UIStroke", btn).Color = Color3.fromRGB(70, 45, 30)
+
         local active = false
         btn.MouseButton1Click:Connect(function()
             active = not active
@@ -624,27 +841,65 @@ local function LaunchSUSHub(isPremium)
                 btn.BackgroundColor3 = Color3.fromRGB(20, 60, 30)
             else
                 btn.Text = "OFF: " .. title
-                btn.BackgroundColor3 = Color3.fromRGB(35, 24, 18)
+                btn.BackgroundColor3 = COLORS.panel
             end
             callback(active)
         end)
     end
 
-    makeToggle("Noclip (Atravessar Paredes)", 150, function(state) noclip = state end)
-    makeToggle("Pulo Infinito", 182, function(state) infJump = state end)
-    makeToggle("Fly (Voa com o Joystick)", 214, function(state) toggleFly() end)
+    makeToggleRow("Noclip (Atravessar Paredes)", 156, function(state)
+        noclip = state
+    end)
 
-    local FpsBtn = Instance.new("TextButton", PlayerPanel)
-    FpsBtn.Size, FpsBtn.Position = UDim2.fromOffset(200, 30), UDim2.fromOffset(15, 246)
-    FpsBtn.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
-    FpsBtn.Text, FpsBtn.TextColor3 = "FPS BOOST", Color3.fromRGB(20, 14, 10)
-    FpsBtn.Font, FpsBtn.TextSize = Enum.Font.GothamBold, 11
-    Instance.new("UICorner", FpsBtn).CornerRadius = UDim.new(0, 4)
-    
-    FpsBtn.MouseButton1Click:Connect(function()
-        Notify("FPS Boost", "Limpando o mapa...", 2)
+    makeToggleRow("Pulo Infinito + Forca do Pulo", 204, function(state)
+        infJump = state
+    end)
+
+    makeToggleRow("Fly (Voar)", 252, function(state)
+        toggleFly(state)
+    end)
+
+    local function makeActionRow(title, desc, yPos, color, callback)
+        local btn = Instance.new("TextButton", PlayerFrame)
+        btn.Size, btn.Position = UDim2.fromOffset(524, 46), UDim2.fromOffset(4, yPos)
+        btn.BackgroundColor3 = COLORS.panel
+        btn.Text = ""
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+        Instance.new("UIStroke", btn).Color = color
+
+        local tLbl = Instance.new("TextLabel", btn)
+        tLbl.Size, tLbl.Position = UDim2.new(1, -16, 0, 20), UDim2.fromOffset(10, 4)
+        tLbl.BackgroundTransparency = 1
+        tLbl.Text, tLbl.TextColor3 = title, color
+        tLbl.Font, tLbl.TextSize = Enum.Font.GothamBold, 11
+        tLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+        local dLbl = Instance.new("TextLabel", btn)
+        dLbl.Size, dLbl.Position = UDim2.new(1, -16, 0, 16), UDim2.fromOffset(10, 24)
+        dLbl.BackgroundTransparency = 1
+        dLbl.Text, dLbl.TextColor3 = desc, COLORS.dim
+        dLbl.Font, dLbl.TextSize = Enum.Font.Gotham, 9
+        dLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+        btn.MouseButton1Click:Connect(callback)
+    end
+
+    makeActionRow("NO FOG", "Remove a neblina do jogo", 300, Color3.fromRGB(100, 150, 255), function()
+        Lighting.FogEnd = 9e9
+        Notify("No Fog", "Neblina removida!", 2)
+    end)
+
+    makeActionRow("BRILHO / GRAFICOS", "Melhora o brilho e a iluminacao do jogo", 352, Color3.fromRGB(200, 100, 255), function()
+        Lighting.Brightness = 3.5
+        Lighting.ClockTime = 14
+        Lighting.Ambient = Color3.fromRGB(170, 170, 170)
+        Notify("Brilho", "Brilho e iluminacao melhorados!", 2)
+    end)
+
+    makeActionRow("FPS BOOST", "Limpa efeitos pesados para ganhar FPS", 404, COLORS.accent, function()
+        Notify("FPS Boost", "Limpando efeitos pesados...", 2)
         pcall(function()
-            for _, v in pairs(workspace:GetDescendants()) do
+            for _, v in ipairs(workspace:GetDescendants()) do
                 if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Sparkles") then
                     v:Destroy()
                 end
@@ -654,60 +909,105 @@ local function LaunchSUSHub(isPremium)
         end)
     end)
 
-    local NoFogBtn = Instance.new("TextButton", PlayerPanel)
-    NoFogBtn.Size, NoFogBtn.Position = UDim2.fromOffset(155, 30), UDim2.fromOffset(225, 246)
-    NoFogBtn.BackgroundColor3 = Color3.fromRGB(100, 150, 255)
-    NoFogBtn.Text, NoFogBtn.TextColor3 = "NO FOG", Color3.fromRGB(20, 14, 10)
-    NoFogBtn.Font, NoFogBtn.TextSize = Enum.Font.GothamBold, 11
-    Instance.new("UICorner", NoFogBtn).CornerRadius = UDim.new(0, 4)
+    -- ABA 5: PREMIUM
+    local PremiumFrame = Instance.new("ScrollingFrame", ContentArea)
+    PremiumFrame.Size = UDim2.fromScale(1, 1)
+    PremiumFrame.BackgroundTransparency = 1
+    PremiumFrame.ScrollBarThickness = 4
+    PremiumFrame.CanvasSize = UDim2.fromOffset(0, 220)
+    PremiumFrame.Visible = false
 
-    NoFogBtn.MouseButton1Click:Connect(function()
-        Lighting.FogEnd = 9e9
-        Notify("No Fog", "Neblina removida!", 2)
-    end)
+    if not isPremium then
+        local lockCard = Instance.new("Frame", PremiumFrame)
+        lockCard.Size = UDim2.fromOffset(524, 150)
+        lockCard.Position = UDim2.fromOffset(4, 10)
+        lockCard.BackgroundColor3 = COLORS.panel
+        Instance.new("UICorner", lockCard).CornerRadius = UDim.new(0, 8)
+        Instance.new("UIStroke", lockCard).Color = Color3.fromRGB(255, 90, 90)
 
-    local GraphicBtn = Instance.new("TextButton", PlayerPanel)
-    GraphicBtn.Size, GraphicBtn.Position = UDim2.fromOffset(125, 30), UDim2.fromOffset(385, 246)
-    GraphicBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 255)
-    GraphicBtn.Text, GraphicBtn.TextColor3 = "GRAFICOS", Color3.fromRGB(20, 14, 10)
-    GraphicBtn.Font, GraphicBtn.TextSize = Enum.Font.GothamBold, 11
-    Instance.new("UICorner", GraphicBtn).CornerRadius = UDim.new(0, 4)
+        local lockTitle = Instance.new("TextLabel", lockCard)
+        lockTitle.Size, lockTitle.Position = UDim2.new(1, -20, 0, 32), UDim2.fromOffset(10, 14)
+        lockTitle.BackgroundTransparency = 1
+        lockTitle.Text = "🔒 ABA BLOQUEADA - PREMIUM / KEY PAGA"
+        lockTitle.TextColor3 = Color3.fromRGB(255, 100, 100)
+        lockTitle.Font, lockTitle.TextSize = Enum.Font.GothamBold, 13
 
-    GraphicBtn.MouseButton1Click:Connect(function()
-        Lighting.Brightness = 3
-        Lighting.ClockTime = 14
-        Lighting.Ambient = Color3.fromRGB(150, 150, 150)
-        Notify("Graficos", "Iluminacao melhorada!", 2)
-    end)
+        local lockDesc = Instance.new("TextLabel", lockCard)
+        lockDesc.Size, lockDesc.Position = UDim2.new(1, -24, 0, 70), UDim2.fromOffset(12, 52)
+        lockDesc.BackgroundTransparency = 1
+        lockDesc.Text = "Essa aba e exclusiva para usuarios com Key valida / versao paga.\nAdquira ou insira uma Key valida na tela inicial para desbloquear."
+        lockDesc.TextColor3 = COLORS.text
+        lockDesc.Font, lockDesc.TextSize = Enum.Font.Gotham, 11
+    else
+        local premRow = Instance.new("TextButton", PremiumFrame)
+        premRow.Size, premRow.Position = UDim2.fromOffset(524, 50), UDim2.fromOffset(4, 8)
+        premRow.BackgroundColor3 = COLORS.panel
+        premRow.Text = ""
+        Instance.new("UICorner", premRow).CornerRadius = UDim.new(0, 8)
+        Instance.new("UIStroke", premRow).Color = Color3.fromRGB(0, 255, 100)
 
-    local function setActiveTab(activeBtn, targetFrame)
-        MainFrame.Visible = false
-        InfoFrame.Visible = false
-        TexturaFrame.Visible = false
-        PlayerFrame.Visible = false
-        
-        MainTabBtn.BackgroundColor3 = Color3.fromRGB(35, 24, 18)
-        InfoTabBtn.BackgroundColor3 = Color3.fromRGB(35, 24, 18)
-        TexturaTabBtn.BackgroundColor3 = Color3.fromRGB(35, 24, 18)
-        PlayerTabBtn.BackgroundColor3 = Color3.fromRGB(35, 24, 18)
-        
-        MainTabBtn.TextColor3 = COLORS.text
-        InfoTabBtn.TextColor3 = COLORS.text
-        TexturaTabBtn.TextColor3 = COLORS.text
-        PlayerTabBtn.TextColor3 = COLORS.text
+        local tLbl = Instance.new("TextLabel", premRow)
+        tLbl.Size, tLbl.Position = UDim2.new(1, -16, 0, 20), UDim2.fromOffset(10, 6)
+        tLbl.BackgroundTransparency = 1
+        tLbl.Text = "Texturas Reais Avancadas (Grass, Stone, Brick, etc.)"
+        tLbl.TextColor3 = Color3.fromRGB(0, 255, 100)
+        tLbl.Font, tLbl.TextSize = Enum.Font.GothamBold, 11
+        tLbl.TextXAlignment = Enum.TextXAlignment.Left
 
-        targetFrame.Visible = true
-        activeBtn.BackgroundColor3 = COLORS.accent
-        activeBtn.TextColor3 = Color3.fromRGB(20, 12, 8)
+        local dLbl = Instance.new("TextLabel", premRow)
+        dLbl.Size, dLbl.Position = UDim2.new(1, -16, 0, 16), UDim2.fromOffset(10, 26)
+        dLbl.BackgroundTransparency = 1
+        dLbl.Text = "Liberado via Key - Aplica texturas detalhadas no mapa"
+        dLbl.TextColor3 = COLORS.dim
+        dLbl.Font, dLbl.TextSize = Enum.Font.Gotham, 9
+        dLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+        premRow.MouseButton1Click:Connect(function()
+            Notify("Texturas Reais", "Aplicando texturas avancadas...", 2)
+            runCustomTexturing()
+        end)
     end
 
-    MainTabBtn.MouseButton1Click:Connect(function() setActiveTab(MainTabBtn, MainFrame) end)
-    InfoTabBtn.MouseButton1Click:Connect(function() setActiveTab(InfoTabBtn, InfoFrame) end)
-    TexturaTabBtn.MouseButton1Click:Connect(function() setActiveTab(TexturaTabBtn, TexturaFrame) end)
-    PlayerTabBtn.MouseButton1Click:Connect(function() setActiveTab(PlayerTabBtn, PlayerFrame) end)
+    local tabs = {
+        {btn = MainTabBtn,    frame = MainFrame,    locked = false},
+        {btn = InfoTabBtn,    frame = InfoFrame,    locked = false},
+        {btn = TexturaTabBtn, frame = TexturaFrame, locked = false},
+        {btn = PlayerTabBtn,  frame = PlayerFrame,  locked = false},
+        {btn = PremiumTabBtn, frame = PremiumFrame, locked = not isPremium},
+    }
 
-    setActiveTab(MainTabBtn, MainFrame)
-    Notify("SUS HUB v.11.2", "Painel carregado com sucesso!", 3)
+    local function setActiveTab(activeItem)
+        if activeItem.locked then
+            Notify("Bloqueado", "Essa aba tem cadeado porque precisa de Key / versao paga!", 3)
+        end
+        for _, item in ipairs(tabs) do
+            item.frame.Visible = false
+            if item.locked then
+                item.btn.BackgroundColor3 = Color3.fromRGB(45, 22, 22)
+                item.btn.TextColor3 = Color3.fromRGB(255, 130, 130)
+            else
+                item.btn.BackgroundColor3 = Color3.fromRGB(35, 24, 18)
+                item.btn.TextColor3 = COLORS.text
+            end
+        end
+        activeItem.frame.Visible = true
+        if activeItem.locked then
+            activeItem.btn.BackgroundColor3 = Color3.fromRGB(140, 35, 35)
+            activeItem.btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        else
+            activeItem.btn.BackgroundColor3 = COLORS.accent
+            activeItem.btn.TextColor3 = Color3.fromRGB(20, 12, 8)
+        end
+    end
+
+    for _, item in ipairs(tabs) do
+        item.btn.MouseButton1Click:Connect(function()
+            setActiveTab(item)
+        end)
+    end
+
+    setActiveTab(tabs[1])
+    Notify(SCRIPT_NAME, "Painel carregado com sucesso!", 3)
 end
 
 -- =====================================================================
@@ -715,7 +1015,7 @@ end
 -- =====================================================================
 local function ShowKeySystem()
     local SG = Instance.new("ScreenGui")
-    SG.Name = "SUS_KeySystem"
+    SG.Name = "LCK_KeySystem"
     SG.ZIndexBehavior = Enum.ZIndexBehavior.Global
     SG.ResetOnSpawn = false
     SG.IgnoreGuiInset = true
@@ -727,7 +1027,7 @@ local function ShowKeySystem()
     Backdrop.BackgroundTransparency = 0.5
 
     local Card = Instance.new("Frame", Backdrop)
-    Card.Size = UDim2.fromOffset(500, 330)
+    Card.Size = UDim2.fromOffset(520, 330)
     Card.AnchorPoint = Vector2.new(0.5, 0.5)
     Card.Position = UDim2.fromScale(0.5, 0.5)
     Card.BackgroundColor3 = Color3.fromRGB(20, 14, 10)
@@ -735,25 +1035,25 @@ local function ShowKeySystem()
     Instance.new("UIStroke", Card).Color = Color3.fromRGB(255, 140, 0)
 
     local TopHeader = Instance.new("Frame", Card)
-    TopHeader.Size = UDim2.new(1, 0, 0, 40)
+    TopHeader.Size = UDim2.new(1, 0, 0, 42)
     TopHeader.BackgroundTransparency = 1
 
     local Title = Instance.new("TextLabel", TopHeader)
-    Title.Size, Title.Position = UDim2.new(1, -120, 1, 0), UDim2.fromOffset(15, 0)
+    Title.Size, Title.Position = UDim2.new(1, -50, 1, 0), UDim2.fromOffset(12, 0)
     Title.BackgroundTransparency = 1
-    Title.Text, Title.TextColor3 = "SUS HUB - Key System", Color3.fromRGB(255, 160, 60)
-    Title.Font, Title.TextSize = Enum.Font.GothamBold, 13
+    Title.Text, Title.TextColor3 = SCRIPT_NAME .. " - Key System", Color3.fromRGB(255, 160, 60)
+    Title.Font, Title.TextSize = Enum.Font.GothamBold, 10
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
     local CloseKeyBtn = Instance.new("TextButton", TopHeader)
-    CloseKeyBtn.Size, CloseKeyBtn.Position = UDim2.fromOffset(24, 24), UDim2.new(1, -28, 0.5, -12)
+    CloseKeyBtn.Size, CloseKeyBtn.Position = UDim2.fromOffset(24, 24), UDim2.new(1, -30, 0.5, -12)
     CloseKeyBtn.BackgroundTransparency = 1
     CloseKeyBtn.Text, CloseKeyBtn.TextColor3 = "X", Color3.fromRGB(255, 100, 100)
     CloseKeyBtn.Font, CloseKeyBtn.TextSize = Enum.Font.GothamBold, 14
     CloseKeyBtn.MouseButton1Click:Connect(function() SG:Destroy() end)
 
     local LeftBox = Instance.new("Frame", Card)
-    LeftBox.Size, LeftBox.Position = UDim2.fromOffset(210, 260), UDim2.fromOffset(15, 50)
+    LeftBox.Size, LeftBox.Position = UDim2.fromOffset(215, 260), UDim2.fromOffset(15, 50)
     LeftBox.BackgroundColor3 = Color3.fromRGB(30, 22, 16)
     Instance.new("UICorner", LeftBox).CornerRadius = UDim.new(0, 8)
     Instance.new("UIStroke", LeftBox).Color = Color3.fromRGB(255, 140, 0)
@@ -761,7 +1061,7 @@ local function ShowKeySystem()
     local InfoLabel = Instance.new("TextLabel", LeftBox)
     InfoLabel.Size, InfoLabel.Position = UDim2.new(1, -16, 0, 55), UDim2.fromOffset(8, 8)
     InfoLabel.BackgroundTransparency = 1
-    InfoLabel.Text = "Information\nCreator: LCK SCRIPT\nVersion: v.11.2"
+    InfoLabel.Text = "Information\nCreator: LCK SCRIPT\nVersion: BETA"
     InfoLabel.TextColor3, InfoLabel.Font, InfoLabel.TextSize = Color3.fromRGB(240, 220, 200), Enum.Font.Gotham, 11
     InfoLabel.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -779,7 +1079,7 @@ local function ShowKeySystem()
     PlayerNameTag.TextXAlignment = Enum.TextXAlignment.Center
 
     local RightBox = Instance.new("Frame", Card)
-    RightBox.Size, RightBox.Position = UDim2.fromOffset(245, 260), UDim2.fromOffset(238, 50)
+    RightBox.Size, RightBox.Position = UDim2.fromOffset(260, 260), UDim2.fromOffset(243, 50)
     RightBox.BackgroundColor3 = Color3.fromRGB(30, 22, 16)
     Instance.new("UICorner", RightBox).CornerRadius = UDim.new(0, 8)
     Instance.new("UIStroke", RightBox).Color = Color3.fromRGB(255, 140, 0)
@@ -806,7 +1106,7 @@ local function ShowKeySystem()
     KeyInput.Font, KeyInput.TextSize = Enum.Font.GothamMedium, 11
     KeyInput.ClearTextOnFocus = false
 
-    local BtnY, BtnH, BtnW, Gap = 140, 34, 75, 4
+    local BtnY, BtnH, BtnW, Gap = 140, 34, 80, 4
 
     local FreeVersionBtn = Instance.new("TextButton", RightBox)
     FreeVersionBtn.Size, FreeVersionBtn.Position = UDim2.fromOffset(BtnW, BtnH), UDim2.fromOffset(8, BtnY)
@@ -831,8 +1131,8 @@ local function ShowKeySystem()
 
     local panelOpen = false
     local OptionPanel = Instance.new("Frame", RightBox)
-    OptionPanel.Size = UDim2.fromOffset(BtnW + 20, 58)
-    OptionPanel.Position = UDim2.fromOffset(8 + BtnW + Gap - 10, BtnY - 62)
+    OptionPanel.Size = UDim2.fromOffset(BtnW + 24, 58)
+    OptionPanel.Position = UDim2.fromOffset(8 + BtnW + Gap - 12, BtnY - 62)
     OptionPanel.BackgroundColor3 = Color3.fromRGB(40, 30, 22)
     OptionPanel.Visible = false
     OptionPanel.ZIndex = 25
@@ -848,7 +1148,11 @@ local function ShowKeySystem()
         optBtn.ZIndex = 26
         Instance.new("UICorner", optBtn).CornerRadius = UDim.new(0, 4)
         optBtn.MouseButton1Click:Connect(function()
-            pcall(function() setclipboard(link) end)
+            pcall(function()
+                if typeof(setclipboard) == "function" then
+                    setclipboard(link)
+                end
+            end)
             StatusLbl.Text, StatusLbl.TextColor3 = "Link Copiado!", Color3.fromRGB(105, 195, 255)
             OptionPanel.Visible, panelOpen = false, false
         end)
@@ -872,7 +1176,7 @@ local function ShowKeySystem()
     EnterKeyBtn.MouseButton1Click:Connect(function()
         local entered = KeyInput.Text:gsub("%s+", "")
         local isValid = false
-        
+
         for _, key in ipairs(API_CONFIG.VALID_KEYS) do
             if entered == key then
                 isValid = true
@@ -891,5 +1195,4 @@ local function ShowKeySystem()
     end)
 end
 
--- Inicializacao
 ShowKeySystem()
