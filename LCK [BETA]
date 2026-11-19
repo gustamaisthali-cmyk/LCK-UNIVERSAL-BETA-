@@ -53,7 +53,7 @@ local function Notify(title, desc, duration)
         StarterGui:SetCore("SendNotification", {
             Title = title or SCRIPT_NAME,
             Text = desc or "",
-            Duration = duration or 4,
+            Duration = duration or 3,
         })
     end)
 end
@@ -90,18 +90,12 @@ local function applyTextureToPart(part, textureId)
 end
 
 local minecraftMaterials = {
-    {"Wood", "rbxassetid://3258599312"},
-    {"WoodPlanks", "rbxassetid://8676581022"},
-    {"Brick", "rbxassetid://8558400252"},
-    {"Cobblestone", "rbxassetid://5003953441"},
-    {"Concrete", "rbxassetid://7341687607"},
-    {"DiamondPlate", "rbxassetid://6849247561"},
-    {"Fabric", "rbxassetid://118776397"},
-    {"Granite", "rbxassetid://4722586771"},
-    {"Grass", "rbxassetid://4722588177"},
-    {"Ice", "rbxassetid://3823766459"},
-    {"Marble", "rbxassetid://62967586"},
-    {"Metal", "rbxassetid://62967586"},
+    {"Wood", "rbxassetid://3258599312"}, {"WoodPlanks", "rbxassetid://8676581022"},
+    {"Brick", "rbxassetid://8558400252"}, {"Cobblestone", "rbxassetid://5003953441"},
+    {"Concrete", "rbxassetid://7341687607"}, {"DiamondPlate", "rbxassetid://6849247561"},
+    {"Fabric", "rbxassetid://118776397"}, {"Granite", "rbxassetid://4722586771"},
+    {"Grass", "rbxassetid://4722588177"}, {"Ice", "rbxassetid://3823766459"},
+    {"Marble", "rbxassetid://62967586"}, {"Metal", "rbxassetid://62967586"},
     {"Sand", "rbxassetid://152572215"}
 }
 
@@ -122,18 +116,12 @@ local function runMinecraftTexturing()
 end
 
 local materialTextures = {
-    {"Grass", "rbxassetid://7547167347"},
-    {"Rock", "rbxassetid://7546651802"},
-    {"Slate", "rbxassetid://7546651802"},
-    {"Concrete", "rbxassetid://7546653328"},
-    {"Wood", "rbxassetid://7547190453"},
-    {"WoodPlanks", "rbxassetid://7547190453"},
-    {"Sand", "rbxassetid://7547294684"},
-    {"Ice", "rbxassetid://7546644642"},
-    {"Marble", "rbxassetid://7547174345"},
-    {"Metal", "rbxassetid://7547178395"},
-    {"Brick", "rbxassetid://7546648254"},
-    {"Granite", "rbxassetid://7547164400"}
+    {"Grass", "rbxassetid://7547167347"}, {"Rock", "rbxassetid://7546651802"},
+    {"Slate", "rbxassetid://7546651802"}, {"Concrete", "rbxassetid://7546653328"},
+    {"Wood", "rbxassetid://7547190453"}, {"WoodPlanks", "rbxassetid://7547190453"},
+    {"Sand", "rbxassetid://7547294684"}, {"Ice", "rbxassetid://7546644642"},
+    {"Marble", "rbxassetid://7547174345"}, {"Metal", "rbxassetid://7547178395"},
+    {"Brick", "rbxassetid://7546648254"}, {"Granite", "rbxassetid://7547164400"}
 }
 
 local function runCustomTexturing()
@@ -239,7 +227,7 @@ local function stackTexturesOnCharacter(id1, id2)
 end
 
 -- =====================================================================
--- LANCAMENTO DO HUB PRINCIPAL (ESTILO IGUAL AO PRINT)
+-- PAINEL PRINCIPAL
 -- =====================================================================
 local function LaunchSUSHub(isPremium)
     local COLORS = {
@@ -300,18 +288,18 @@ local function LaunchSUSHub(isPremium)
     closeBtn.Parent = titleBar
     Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
 
-    local openBtn = Instance.new("TextButton")
-    openBtn.Size = UDim2.fromOffset(190, 36)
-    openBtn.Position = UDim2.new(0, 14, 0.5, -18)
+    -- Botao flutuante arrastavel (com foto do jogador)
+    local openBtn = Instance.new("ImageButton")
+    openBtn.Size = UDim2.fromOffset(46, 46)
+    openBtn.Position = UDim2.new(0, 14, 0.5, -23)
     openBtn.BackgroundColor3 = COLORS.panel
-    openBtn.Text = SCRIPT_NAME
-    openBtn.TextColor3 = COLORS.accent
-    openBtn.Font = Enum.Font.GothamBold
-    openBtn.TextSize = 10
+    openBtn.Image = PlayerAvatarUrl
     openBtn.Visible = false
     openBtn.Parent = gui
-    Instance.new("UICorner", openBtn).CornerRadius = UDim.new(0, 8)
-    Instance.new("UIStroke", openBtn).Color = COLORS.accent
+    Instance.new("UICorner", openBtn).CornerRadius = UDim.new(1, 0)
+    local fStroke = Instance.new("UIStroke", openBtn)
+    fStroke.Color = COLORS.accent
+    fStroke.Thickness = 2
 
     local function makeDraggable(dragHandle, targetFrame, onClickCallback)
         local dragging, dragStart, startPos, moved = false, nil, nil, false
@@ -354,7 +342,6 @@ local function LaunchSUSHub(isPremium)
         openBtn.Visible = true
     end)
 
-    -- Barra de Abas (estilo do print)
     local TabBar = Instance.new("Frame", main)
     TabBar.Size = UDim2.new(1, -28, 0, 32)
     TabBar.Position = UDim2.fromOffset(14, 54)
@@ -380,7 +367,6 @@ local function LaunchSUSHub(isPremium)
     local PlayerTabBtn  = makeTabButton("Jogador", 298, 86, false)
     local PremiumTabBtn = makeTabButton("Premium", 392, 114, not isPremium)
 
-    -- Caixa com borda laranja igual ao print
     local OuterBox = Instance.new("Frame", main)
     OuterBox.Size = UDim2.new(1, -28, 1, -100)
     OuterBox.Position = UDim2.fromOffset(14, 92)
@@ -448,84 +434,77 @@ local function LaunchSUSHub(isPremium)
         if onClick then
             card.MouseButton1Click:Connect(onClick)
         end
-        return card
+        return card, tLbl
     end
 
-    -- ABA 1: MAIN
+    -- ABA 1: MAIN (com foto do perfil)
     local MainFrame = createTabScroll("PAINEL PRINCIPAL & REDES", 270)
     MainFrame.Visible = true
 
-    createCard(
-        MainFrame,
-        LocalPlayer.Name .. " (@" .. LocalPlayer.Name .. ")",
-        "HWID: " .. GetHWID():sub(1, 18) .. "...",
-        34,
-        Color3.fromRGB(255, 170, 75),
-        nil
-    )
-    createCard(
-        MainFrame,
-        "Discord Oficial",
-        "Copiar link do servidor Discord",
-        94,
-        Color3.fromRGB(90, 235, 110),
-        function()
-            pcall(function() setclipboard(API_CONFIG.DISCORD_INVITE) end)
-            Notify("Copiado", "Discord copiado!")
-        end
-    )
-    createCard(
-        MainFrame,
-        "YouTube @LCK_SCRIPT",
-        "Copiar link do canal no YouTube",
-        154,
-        Color3.fromRGB(90, 235, 110),
-        function()
-            pcall(function() setclipboard(API_CONFIG.YOUTUBE_URL) end)
-            Notify("Copiado", "YouTube copiado!")
-        end
-    )
-    createCard(
-        MainFrame,
-        "Instagram @011.gustavofx",
-        "Copiar link do Instagram",
-        214,
-        Color3.fromRGB(90, 235, 110),
-        function()
-            pcall(function() setclipboard(API_CONFIG.INSTAGRAM_URL) end)
-            Notify("Copiado", "Instagram copiado!")
-        end
-    )
+    local profileCard = Instance.new("Frame", MainFrame)
+    profileCard.Size = UDim2.new(1, -4, 0, 56)
+    profileCard.Position = UDim2.fromOffset(0, 32)
+    profileCard.BackgroundColor3 = COLORS.rowBg
+    profileCard.BorderSizePixel = 0
+    Instance.new("UICorner", profileCard).CornerRadius = UDim.new(0, 6)
+    local pStroke = Instance.new("UIStroke", profileCard)
+    pStroke.Color = Color3.fromRGB(55, 38, 28)
+    pStroke.Thickness = 1
+
+    local avatarImg = Instance.new("ImageLabel", profileCard)
+    avatarImg.Size = UDim2.fromOffset(40, 40)
+    avatarImg.Position = UDim2.fromOffset(10, 8)
+    avatarImg.BackgroundColor3 = COLORS.panel
+    avatarImg.Image = PlayerAvatarUrl
+    Instance.new("UICorner", avatarImg).CornerRadius = UDim.new(1, 0)
+    Instance.new("UIStroke", avatarImg).Color = COLORS.accent
+
+    local pNameLbl = Instance.new("TextLabel", profileCard)
+    pNameLbl.Size = UDim2.new(1, -64, 0, 20)
+    pNameLbl.Position = UDim2.fromOffset(58, 8)
+    pNameLbl.BackgroundTransparency = 1
+    pNameLbl.Text = LocalPlayer.Name .. " (@" .. LocalPlayer.Name .. ")"
+    pNameLbl.TextColor3 = Color3.fromRGB(255, 170, 75)
+    pNameLbl.Font = Enum.Font.GothamBold
+    pNameLbl.TextSize = 11
+    pNameLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+    local pHwidLbl = Instance.new("TextLabel", profileCard)
+    pHwidLbl.Size = UDim2.new(1, -64, 0, 16)
+    pHwidLbl.Position = UDim2.fromOffset(58, 28)
+    pHwidLbl.BackgroundTransparency = 1
+    pHwidLbl.Text = "HWID: " .. GetHWID():sub(1, 18) .. "..."
+    pHwidLbl.TextColor3 = COLORS.dim
+    pHwidLbl.Font = Enum.Font.Gotham
+    pHwidLbl.TextSize = 10
+    pHwidLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+    createCard(MainFrame, "Discord Oficial", "Copiar link do servidor Discord", 96, Color3.fromRGB(90, 235, 110), function()
+        pcall(function() setclipboard(API_CONFIG.DISCORD_INVITE) end)
+        Notify("Copiado", "Discord copiado!")
+    end)
+    createCard(MainFrame, "YouTube @LCK_SCRIPT", "Copiar link do canal no YouTube", 156, Color3.fromRGB(90, 235, 110), function()
+        pcall(function() setclipboard(API_CONFIG.YOUTUBE_URL) end)
+        Notify("Copiado", "YouTube copiado!")
+    end)
+    createCard(MainFrame, "Instagram @011.gustavofx", "Copiar link do Instagram", 216, Color3.fromRGB(90, 235, 110), function()
+        pcall(function() setclipboard(API_CONFIG.INSTAGRAM_URL) end)
+        Notify("Copiado", "Instagram copiado!")
+    end)
 
     -- ABA 2: INFORMACOES
     local InfoFrame = createTabScroll("CENTRAL DE INFORMACOES", 170)
-
-    createCard(
-        InfoFrame,
-        "LCK HUB PIGGY 1.60",
-        "Executar script para Piggy",
-        34,
-        Color3.fromRGB(90, 235, 110),
-        function()
-            Notify("Carregando...", "Executando LCK HUB PIGGY", 2)
-            pcall(function() loadstring(game:HttpGet("https://pastefy.app/ck27ob4i/raw"))() end)
-        end
-    )
-    createCard(
-        InfoFrame,
-        "redzlib v5 UI Library",
-        "Carregar interface redzlib",
-        94,
-        Color3.fromRGB(90, 235, 110),
-        function()
-            Notify("Carregando...", "Executando redzlib v5", 2)
-            pcall(function() loadstring(game:HttpGet("https://pastefy.app/SglyCstp/raw"))() end)
-        end
-    )
+    createCard(InfoFrame, "LCK HUB PIGGY 1.60", "Executar script para Piggy", 34, Color3.fromRGB(90, 235, 110), function()
+        Notify("Carregando...", "Executando LCK HUB PIGGY", 2)
+        pcall(function() loadstring(game:HttpGet("https://pastefy.app/ck27ob4i/raw"))() end)
+    end)
+    createCard(InfoFrame, "redzlib v5 UI Library", "Carregar interface redzlib", 94, Color3.fromRGB(90, 235, 110), function()
+        Notify("Carregando...", "Executando redzlib v5", 2)
+        pcall(function() loadstring(game:HttpGet("https://pastefy.app/SglyCstp/raw"))() end)
+    end)
 
     -- ABA 3: TEXTURAS
     local TexturaFrame = createTabScroll("GERENCIADOR DE TEXTURAS (FREE & PREMIUM)", 290)
-
     local mcNameEnabled = false
     LocalPlayer.CharacterAdded:Connect(function(char)
         if mcNameEnabled then
@@ -534,50 +513,27 @@ local function LaunchSUSHub(isPremium)
         end
     end)
 
-    createCard(
-        TexturaFrame,
-        "Textura Minecraft (FREE)",
-        "Disponivel para todos os usuarios no modo livre",
-        34,
-        Color3.fromRGB(90, 235, 110),
-        function()
-            Notify("Textura", "Aplicando texturas do Minecraft...", 2)
-            runMinecraftTexturing()
+    createCard(TexturaFrame, "Textura Minecraft (FREE)", "Disponivel para todos os usuarios no modo livre", 34, Color3.fromRGB(90, 235, 110), function()
+        Notify("Textura", "Aplicando texturas do Minecraft...", 2)
+        runMinecraftTexturing()
+    end)
+    createCard(TexturaFrame, "Textura no Nome Estilo Minecraft", "Mantem o nome do jogador com estilo pixelado/Arcade", 94, Color3.fromRGB(110, 220, 255), function()
+        mcNameEnabled = not mcNameEnabled
+        if mcNameEnabled then
+            applyMinecraftNameTag(LocalPlayer.Character)
+            Notify("Nome Minecraft", "Textura aplicada no nome!", 2)
+        else
+            local head = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head")
+            local old = head and head:FindFirstChild("SusMCNameTag")
+            if old then old:Destroy() end
+            local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if hum then hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer end
+            Notify("Nome Minecraft", "Textura removida do nome.", 2)
         end
-    )
-    createCard(
-        TexturaFrame,
-        "Textura no Nome Estilo Minecraft",
-        "Mantem o nome do jogador com estilo pixelado/Arcade",
-        94,
-        Color3.fromRGB(110, 220, 255),
-        function()
-            mcNameEnabled = not mcNameEnabled
-            if mcNameEnabled then
-                applyMinecraftNameTag(LocalPlayer.Character)
-                Notify("Nome Minecraft", "Textura aplicada no nome!", 2)
-            else
-                local head = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head")
-                local old = head and head:FindFirstChild("SusMCNameTag")
-                if old then old:Destroy() end
-                local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-                if hum then
-                    hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer
-                end
-                Notify("Nome Minecraft", "Textura removida do nome.", 2)
-            end
-        end
-    )
-    createCard(
-        TexturaFrame,
-        "Empilhar Texturas no Personagem",
-        "Aplica duas camadas de textura no corpo do personagem",
-        154,
-        Color3.fromRGB(255, 120, 190),
-        function()
-            stackTexturesOnCharacter("rbxassetid://7546651802", "rbxassetid://7547167347")
-        end
-    )
+    end)
+    createCard(TexturaFrame, "Empilhar Texturas no Personagem", "Aplica duas camadas de textura no corpo do personagem", 154, Color3.fromRGB(255, 120, 190), function()
+        stackTexturesOnCharacter("rbxassetid://7546651802", "rbxassetid://7547167347")
+    end)
     createCard(
         TexturaFrame,
         (isPremium and "[LIBERADO] " or "[PAGO / PREMIUM] ") .. "Texturas Reais Avancadas (Grass, Stone, Brick, etc.)",
@@ -594,8 +550,10 @@ local function LaunchSUSHub(isPremium)
         end
     )
 
-    -- ABA 4: JOGADOR
-    local PlayerFrame = createTabScroll("CONTROLES DO JOGADOR", 540)
+    -- =====================================================================
+    -- ABA 4: JOGADOR (CONTROLE EMBAIXO DA OPCAO + CAIXA + SETAS + INF)
+    -- =====================================================================
+    local PlayerFrame = createTabScroll("CONTROLES DO JOGADOR", 640)
 
     local noclip = false
     local infJump = false
@@ -603,6 +561,9 @@ local function LaunchSUSHub(isPremium)
     local flySpeed = 60
     local jumpForce = 80
     local walkSpeedVal = 24
+    local infSpeedActive = false
+    local infJumpPowerActive = false
+    local infFlyActive = false
 
     RunService.Stepped:Connect(function()
         if noclip and LocalPlayer.Character then
@@ -620,10 +581,11 @@ local function LaunchSUSHub(isPremium)
             local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
             if hum then
                 hum.UseJumpPower = true
-                hum.JumpPower = jumpForce
+                local powerToUse = infJumpPowerActive and 350 or jumpForce
+                hum.JumpPower = powerToUse
                 hum:ChangeState(Enum.HumanoidStateType.Jumping)
                 if hrp then
-                    local boostY = math.clamp(jumpForce * 0.75, 45, 220)
+                    local boostY = infJumpPowerActive and 260 or math.clamp(jumpForce * 0.75, 45, 240)
                     hrp.AssemblyLinearVelocity = Vector3.new(hrp.AssemblyLinearVelocity.X, boostY, hrp.AssemblyLinearVelocity.Z)
                 end
             end
@@ -638,27 +600,18 @@ local function LaunchSUSHub(isPremium)
         local hum = char:FindFirstChildOfClass("Humanoid")
 
         if flying then
-            if not hrp or not hum then
-                flying = false
-                return
-            end
-
+            if not hrp or not hum then flying = false return end
             local oldBg = hrp:FindFirstChild("FlyGyro")
             if oldBg then oldBg:Destroy() end
             local oldBv = hrp:FindFirstChild("FlyVel")
             if oldBv then oldBv:Destroy() end
 
             local bg = Instance.new("BodyGyro")
-            bg.Name = "FlyGyro"
-            bg.P = 9e4
-            bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-            bg.CFrame = hrp.CFrame
+            bg.Name, bg.P, bg.MaxTorque, bg.CFrame = "FlyGyro", 9e4, Vector3.new(9e9, 9e9, 9e9), hrp.CFrame
             bg.Parent = hrp
 
             local bv = Instance.new("BodyVelocity")
-            bv.Name = "FlyVel"
-            bv.Velocity = Vector3.zero
-            bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+            bv.Name, bv.Velocity, bv.MaxForce = "FlyVel", Vector3.zero, Vector3.new(9e9, 9e9, 9e9)
             bv.Parent = hrp
 
             hum.PlatformStand = true
@@ -669,9 +622,7 @@ local function LaunchSUSHub(isPremium)
                 if bg then bg:Destroy() end
                 if bv then bv:Destroy() end
             end
-            if hum then
-                hum.PlatformStand = false
-            end
+            if hum then hum.PlatformStand = false end
         end
     end
 
@@ -684,56 +635,68 @@ local function LaunchSUSHub(isPremium)
             local cam = workspace.CurrentCamera
 
             if hrp and hum and bv and cam then
-                local moveDir = hum.MoveDirection
-                local flyDir = cam.CFrame:VectorToWorldSpace(Vector3.new(moveDir.X, 0, moveDir.Z))
-
+                local dir = hum.MoveDirection
+                local flyDir = cam.CFrame:VectorToWorldSpace(Vector3.new(dir.X, 0, dir.Z))
                 if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
                     flyDir += Vector3.new(0, 1, 0)
                 elseif UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
                     flyDir -= Vector3.new(0, 1, 0)
                 end
-
-                bv.Velocity = flyDir * flySpeed
-                if bg then
-                    bg.CFrame = cam.CFrame
-                end
+                local velAtual = infFlyActive and 300 or flySpeed
+                bv.Velocity = flyDir * velAtual
+                if bg then bg.CFrame = cam.CFrame end
             end
         end
     end)
 
-    local function createStatCard(labelText, defaultVal, stepAdd, yPos, onApply)
-        local row = Instance.new("Frame", PlayerFrame)
-        row.Size = UDim2.new(1, -4, 0, 52)
-        row.Position = UDim2.fromOffset(0, yPos)
-        row.BackgroundColor3 = COLORS.rowBg
-        row.BorderSizePixel = 0
-        Instance.new("UICorner", row).CornerRadius = UDim.new(0, 6)
-        Instance.new("UIStroke", row).Color = Color3.fromRGB(55, 38, 28)
+    -- Bloco que fica embaixo da opcao: caixa para digitar + setas ▲ / ▼ + botao INF
+    local function createSubControl(parent, yPos, initialVal, stepVal, onValueChanged, onInfToggle)
+        local sub = Instance.new("Frame", parent)
+        sub.Size = UDim2.new(1, -4, 0, 38)
+        sub.Position = UDim2.fromOffset(0, yPos)
+        sub.BackgroundColor3 = Color3.fromRGB(28, 20, 15)
+        sub.BorderSizePixel = 0
+        Instance.new("UICorner", sub).CornerRadius = UDim.new(0, 6)
+        local sStroke = Instance.new("UIStroke", sub)
+        sStroke.Color = Color3.fromRGB(75, 50, 35)
+        sStroke.Thickness = 1
 
-        local lbl = Instance.new("TextLabel", row)
-        lbl.Size = UDim2.new(0.42, 0, 1, 0)
-        lbl.Position = UDim2.fromOffset(12, 0)
-        lbl.BackgroundTransparency = 1
-        lbl.Text = labelText
-        lbl.TextColor3 = COLORS.text
-        lbl.Font = Enum.Font.GothamBold
-        lbl.TextSize = 11
-        lbl.TextXAlignment = Enum.TextXAlignment.Left
-
-        local box = Instance.new("TextBox", row)
-        box.Size = UDim2.fromOffset(66, 28)
-        box.Position = UDim2.new(0.45, 0, 0.5, -14)
+        local box = Instance.new("TextBox", sub)
+        box.Size = UDim2.fromOffset(92, 26)
+        box.Position = UDim2.fromOffset(10, 6)
         box.BackgroundColor3 = Color3.fromRGB(14, 10, 8)
-        box.Text = tostring(defaultVal)
+        box.Text = tostring(initialVal)
         box.TextColor3 = COLORS.text
         box.Font = Enum.Font.GothamBold
         box.TextSize = 11
         box.ClearTextOnFocus = false
         Instance.new("UICorner", box).CornerRadius = UDim.new(0, 5)
 
-        local applyBtn = Instance.new("TextButton", row)
-        applyBtn.Size = UDim2.fromOffset(64, 28)
-        applyBtn.Position = UDim2.new(0.63, 0, 0.5, -14)
+        -- Seta para puxar / subir valor
+        local upBtn = Instance.new("TextButton", sub)
+        upBtn.Size = UDim2.fromOffset(38, 26)
+        upBtn.Position = UDim2.fromOffset(110, 6)
+        upBtn.BackgroundColor3 = COLORS.accent
+        upBtn.Text = "▲"
+        upBtn.TextColor3 = Color3.fromRGB(15, 12, 10)
+        upBtn.Font = Enum.Font.GothamBold
+        upBtn.TextSize = 11
+        Instance.new("UICorner", upBtn).CornerRadius = UDim.new(0, 5)
+
+        -- Seta para abaixar valor
+        local downBtn = Instance.new("TextButton", sub)
+        downBtn.Size = UDim2.fromOffset(38, 26)
+        downBtn.Position = UDim2.fromOffset(154, 6)
+        downBtn.BackgroundColor3 = Color3.fromRGB(60, 42, 30)
+        downBtn.Text = "▼"
+        downBtn.TextColor3 = COLORS.text
+        downBtn.Font = Enum.Font.GothamBold
+        downBtn.TextSize = 11
+        Instance.new("UICorner", downBtn).CornerRadius = UDim.new(0, 5)
+
+        local applyBtn = Instance.new("TextButton", sub)
+        applyBtn.Size = UDim2.fromOffset(66, 26)
+        applyBtn.Position = UDim2.fromOffset(198, 6)
         applyBtn.BackgroundColor3 = Color3.fromRGB(90, 235, 110)
         applyBtn.Text = "Aplicar"
         applyBtn.TextColor3 = Color3.fromRGB(15, 12, 10)
@@ -741,115 +704,155 @@ local function LaunchSUSHub(isPremium)
         applyBtn.TextSize = 10
         Instance.new("UICorner", applyBtn).CornerRadius = UDim.new(0, 5)
 
-        local addBtn = Instance.new("TextButton", row)
-        addBtn.Size = UDim2.fromOffset(74, 28)
-        addBtn.Position = UDim2.new(0.80, 0, 0.5, -14)
-        addBtn.BackgroundColor3 = COLORS.accent
-        addBtn.Text = "+" .. tostring(stepAdd)
-        addBtn.TextColor3 = Color3.fromRGB(15, 12, 10)
-        addBtn.Font = Enum.Font.GothamBold
-        addBtn.TextSize = 10
-        Instance.new("UICorner", addBtn).CornerRadius = UDim.new(0, 5)
+        local infBtn = Instance.new("TextButton", sub)
+        infBtn.Size = UDim2.fromOffset(58, 26)
+        infBtn.Position = UDim2.fromOffset(270, 6)
+        infBtn.BackgroundColor3 = Color3.fromRGB(45, 30, 22)
+        infBtn.Text = "INF: OFF"
+        infBtn.TextColor3 = Color3.fromRGB(255, 190, 90)
+        infBtn.Font = Enum.Font.GothamBold
+        infBtn.TextSize = 10
+        Instance.new("UICorner", infBtn).CornerRadius = UDim.new(0, 5)
+
+        local function commitValue(v)
+            box.Text = tostring(v)
+            onValueChanged(v)
+        end
+
+        box.FocusLost:Connect(function()
+            local n = tonumber(box.Text)
+            if n then commitValue(n) end
+        end)
 
         applyBtn.MouseButton1Click:Connect(function()
-            local num = tonumber(box.Text)
-            if num then onApply(num) end
+            local n = tonumber(box.Text)
+            if n then commitValue(n) end
         end)
-        addBtn.MouseButton1Click:Connect(function()
-            local cur = tonumber(box.Text) or defaultVal
-            local nextVal = cur + stepAdd
-            box.Text = tostring(nextVal)
-            onApply(nextVal)
+
+        upBtn.MouseButton1Click:Connect(function()
+            local cur = tonumber(box.Text) or initialVal
+            commitValue(cur + stepVal)
+        end)
+
+        downBtn.MouseButton1Click:Connect(function()
+            local cur = tonumber(box.Text) or initialVal
+            commitValue(math.max(1, cur - stepVal))
+        end)
+
+        local infOn = false
+        infBtn.MouseButton1Click:Connect(function()
+            infOn = not infOn
+            infBtn.Text = infOn and "INF: ON" or "INF: OFF"
+            infBtn.BackgroundColor3 = infOn and Color3.fromRGB(25, 70, 35) or Color3.fromRGB(45, 30, 22)
+            onInfToggle(infOn, box)
         end)
     end
 
-    createStatCard("Speed (Velocidade)", walkSpeedVal, 15, 34, function(val)
+    -- 1) Speed + controle embaixo
+    createCard(PlayerFrame, "Speed (Velocidade)", "Ajuste pelo campo ou setas ▲ / ▼ embaixo", 34, Color3.fromRGB(90, 235, 110), nil)
+    createSubControl(PlayerFrame, 90, walkSpeedVal, 10, function(val)
         walkSpeedVal = math.max(1, val)
         local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-        if hum then hum.WalkSpeed = walkSpeedVal end
+        if hum and not infSpeedActive then hum.WalkSpeed = walkSpeedVal end
         Notify("Speed", "Velocidade: " .. walkSpeedVal, 2)
+    end, function(isInf, box)
+        infSpeedActive = isInf
+        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if isInf then
+            box.Text = "INF"
+            if hum then hum.WalkSpeed = 250 end
+            Notify("Speed", "Modo velocidade alta/INF ativado!", 2)
+        else
+            box.Text = tostring(walkSpeedVal)
+            if hum then hum.WalkSpeed = walkSpeedVal end
+        end
     end)
 
-    createStatCard("Forca do Pulo", jumpForce, 25, 92, function(val)
+    -- 2) Forca do Pulo + Pulo Infinito embaixo
+    do
+        local active = false
+        local c, lbl = createCard(PlayerFrame, "OFF: Pulo Infinito + Forca do Pulo", "Pula no ar e usa a forca configurada embaixo", 136, COLORS.text, nil)
+        c.MouseButton1Click:Connect(function()
+            active = not active
+            infJump = active
+            lbl.Text = (active and "ON: " or "OFF: ") .. "Pulo Infinito + Forca do Pulo"
+        end)
+    end
+    createSubControl(PlayerFrame, 192, jumpForce, 20, function(val)
         jumpForce = math.max(10, val)
         local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-        if hum then
+        if hum and not infJumpPowerActive then
             hum.UseJumpPower = true
             hum.JumpPower = jumpForce
         end
         Notify("Forca do Pulo", "Forca ajustada para " .. jumpForce, 2)
+    end, function(isInf, box)
+        infJumpPowerActive = isInf
+        if isInf then
+            box.Text = "INF"
+            Notify("Forca do Pulo", "Forca de pulo maxima/INF ativada!", 2)
+        else
+            box.Text = tostring(jumpForce)
+        end
     end)
 
-    createStatCard("Velocidade do Fly", flySpeed, 20, 150, function(val)
-        flySpeed = math.max(5, val)
-        Notify("Fly", "Velocidade do Fly: " .. flySpeed, 2)
-    end)
-
+    -- 3) Fly + velocidade do Fly embaixo
     do
         local active = false
-        local c = createCard(PlayerFrame, "OFF: Noclip", "Atravessar paredes", 208, COLORS.text, function()
-            active = not active
-            noclip = active
-            c:FindFirstChildOfType("TextLabel").Text = (active and "ON: " or "OFF: ") .. "Noclip"
-        end)
-    end
-
-    do
-        local active = false
-        local c = createCard(PlayerFrame, "OFF: Pulo Infinito + Forca", "Pula no ar usando a forca configurada", 266, COLORS.text, function()
-            active = not active
-            infJump = active
-            c:FindFirstChildOfType("TextLabel").Text = (active and "ON: " or "OFF: ") .. "Pulo Infinito + Forca"
-        end)
-    end
-
-    do
-        local active = false
-        local c = createCard(PlayerFrame, "OFF: Fly", "Voar usando a velocidade configurada", 324, COLORS.text, function()
+        local c, lbl = createCard(PlayerFrame, "OFF: Fly", "Voar usando a velocidade configurada embaixo", 238, COLORS.text, nil)
+        c.MouseButton1Click:Connect(function()
             active = not active
             toggleFly(active)
-            c:FindFirstChildOfType("TextLabel").Text = (active and "ON: " or "OFF: ") .. "Fly"
+            lbl.Text = (active and "ON: " or "OFF: ") .. "Fly"
+        end)
+    end
+    createSubControl(PlayerFrame, 294, flySpeed, 15, function(val)
+        flySpeed = math.max(5, val)
+        Notify("Fly", "Velocidade do Fly: " .. flySpeed, 2)
+    end, function(isInf, box)
+        infFlyActive = isInf
+        if isInf then
+            box.Text = "INF"
+            Notify("Fly", "Velocidade do Fly maxima/INF ativada!", 2)
+        else
+            box.Text = tostring(flySpeed)
+        end
+    end)
+
+    -- 4) Noclip, No Fog e Brilho
+    do
+        local active = false
+        local c, lbl = createCard(PlayerFrame, "OFF: Noclip", "Atravessar paredes", 340, COLORS.text, nil)
+        c.MouseButton1Click:Connect(function()
+            active = not active
+            noclip = active
+            lbl.Text = (active and "ON: " or "OFF: ") .. "Noclip"
         end)
     end
 
-    createCard(PlayerFrame, "NO FOG", "Remove a neblina do jogo", 382, Color3.fromRGB(110, 175, 255), function()
+    createCard(PlayerFrame, "NO FOG", "Remove a neblina do jogo", 398, Color3.fromRGB(110, 175, 255), function()
         Lighting.FogEnd = 9e9
         Notify("No Fog", "Neblina removida!", 2)
     end)
 
-    createCard(PlayerFrame, "BRILHO / GRAFICOS", "Melhora o brilho e a iluminacao do jogo", 440, Color3.fromRGB(220, 130, 255), function()
+    createCard(PlayerFrame, "BRILHO / GRAFICOS", "Melhora o brilho e a iluminacao do jogo", 456, Color3.fromRGB(220, 130, 255), function()
         Lighting.Brightness = 3.5
         Lighting.ClockTime = 14
         Lighting.Ambient = Color3.fromRGB(170, 170, 170)
         Notify("Brilho", "Brilho melhorado!", 2)
     end)
 
-    -- ABA 5: PREMIUM (SEPARADA COM CADEADO / KEY PAGA)
+    -- ABA 5: PREMIUM (SEPARADA COM CADEADO)
     local PremiumFrame = createTabScroll("AREA PREMIUM (REQUER KEY / PAGO)", 170)
-
     if not isPremium then
-        createCard(
-            PremiumFrame,
-            "🔒 Conteudo Bloqueado por Cadeado",
-            "Requer Key valida / versao paga na tela inicial para liberar",
-            34,
-            Color3.fromRGB(255, 115, 115),
-            function()
-                Notify("Bloqueado", "Essa aba precisa de Key / versao paga!", 3)
-            end
-        )
+        createCard(PremiumFrame, "🔒 Conteudo Bloqueado por Cadeado", "Requer Key valida / versao paga na tela inicial para liberar", 34, Color3.fromRGB(255, 115, 115), function()
+            Notify("Bloqueado", "Essa aba precisa de Key / versao paga!", 3)
+        end)
     else
-        createCard(
-            PremiumFrame,
-            "[PAGO / PREMIUM] Texturas Reais Avancadas (Grass, Stone, Brick, etc.)",
-            "Liberado via Key - Aplica texturas detalhadas no mapa",
-            34,
-            Color3.fromRGB(90, 235, 110),
-            function()
-                Notify("Texturas Reais", "Aplicando texturas avancadas...", 2)
-                runCustomTexturing()
-            end
-        )
+        createCard(PremiumFrame, "[PAGO / PREMIUM] Texturas Reais Avancadas (Grass, Stone, Brick, etc.)", "Liberado via Key - Aplica texturas detalhadas no mapa", 34, Color3.fromRGB(90, 235, 110), function()
+            Notify("Texturas Reais", "Aplicando texturas avancadas...", 2)
+            runCustomTexturing()
+        end)
     end
 
     local tabs = {
@@ -895,7 +898,7 @@ local function LaunchSUSHub(isPremium)
 end
 
 -- =====================================================================
--- TELA DE KEY
+-- MENU DE ENTRADA / KEY (SIMPLES E DIRETO)
 -- =====================================================================
 local function ShowKeySystem()
     local SG = Instance.new("ScreenGui")
@@ -905,176 +908,160 @@ local function ShowKeySystem()
     SG.IgnoreGuiInset = true
     Protect(SG)
 
-    local Backdrop = Instance.new("Frame", SG)
-    Backdrop.Size = UDim2.fromScale(1, 1)
-    Backdrop.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    Backdrop.BackgroundTransparency = 0.5
-
-    local Card = Instance.new("Frame", Backdrop)
-    Card.Size = UDim2.fromOffset(520, 330)
+    local Card = Instance.new("Frame", SG)
+    Card.Size = UDim2.fromOffset(380, 210)
     Card.AnchorPoint = Vector2.new(0.5, 0.5)
     Card.Position = UDim2.fromScale(0.5, 0.5)
-    Card.BackgroundColor3 = Color3.fromRGB(20, 14, 10)
-    Instance.new("UICorner", Card).CornerRadius = UDim.new(0, 12)
-    Instance.new("UIStroke", Card).Color = Color3.fromRGB(255, 140, 0)
+    Card.BackgroundColor3 = Color3.fromRGB(18, 13, 10)
+    Instance.new("UICorner", Card).CornerRadius = UDim.new(0, 10)
+    local cStroke = Instance.new("UIStroke", Card)
+    cStroke.Color = Color3.fromRGB(255, 136, 0)
+    cStroke.Thickness = 1.2
 
-    local TopHeader = Instance.new("Frame", Card)
-    TopHeader.Size = UDim2.new(1, 0, 0, 42)
-    TopHeader.BackgroundTransparency = 1
-
-    local Title = Instance.new("TextLabel", TopHeader)
-    Title.Size, Title.Position = UDim2.new(1, -50, 1, 0), UDim2.fromOffset(12, 0)
+    local Title = Instance.new("TextLabel", Card)
+    Title.Size = UDim2.new(1, -44, 0, 34)
+    Title.Position = UDim2.fromOffset(12, 4)
     Title.BackgroundTransparency = 1
-    Title.Text, Title.TextColor3 = SCRIPT_NAME .. " - Key System", Color3.fromRGB(255, 160, 60)
-    Title.Font, Title.TextSize = Enum.Font.GothamBold, 10
+    Title.Text = SCRIPT_NAME
+    Title.TextColor3 = Color3.fromRGB(255, 165, 65)
+    Title.Font = Enum.Font.GothamBold
+    Title.TextSize = 10
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
-    local CloseKeyBtn = Instance.new("TextButton", TopHeader)
-    CloseKeyBtn.Size, CloseKeyBtn.Position = UDim2.fromOffset(24, 24), UDim2.new(1, -30, 0.5, -12)
-    CloseKeyBtn.BackgroundTransparency = 1
-    CloseKeyBtn.Text, CloseKeyBtn.TextColor3 = "X", Color3.fromRGB(255, 100, 100)
-    CloseKeyBtn.Font, CloseKeyBtn.TextSize = Enum.Font.GothamBold, 14
-    CloseKeyBtn.MouseButton1Click:Connect(function() SG:Destroy() end)
+    local CloseBtn = Instance.new("TextButton", Card)
+    CloseBtn.Size = UDim2.fromOffset(24, 24)
+    CloseBtn.Position = UDim2.new(1, -32, 0, 8)
+    CloseBtn.BackgroundColor3 = Color3.fromRGB(45, 22, 20)
+    CloseBtn.Text = "X"
+    CloseBtn.TextColor3 = Color3.fromRGB(255, 120, 120)
+    CloseBtn.Font = Enum.Font.GothamBold
+    CloseBtn.TextSize = 12
+    Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
+    CloseBtn.MouseButton1Click:Connect(function() SG:Destroy() end)
 
-    local LeftBox = Instance.new("Frame", Card)
-    LeftBox.Size, LeftBox.Position = UDim2.fromOffset(215, 260), UDim2.fromOffset(15, 50)
-    LeftBox.BackgroundColor3 = Color3.fromRGB(30, 22, 16)
-    Instance.new("UICorner", LeftBox).CornerRadius = UDim.new(0, 8)
-    Instance.new("UIStroke", LeftBox).Color = Color3.fromRGB(255, 140, 0)
+    local StatusLbl = Instance.new("TextLabel", Card)
+    StatusLbl.Size = UDim2.new(1, -24, 0, 20)
+    StatusLbl.Position = UDim2.fromOffset(12, 40)
+    StatusLbl.BackgroundTransparency = 1
+    StatusLbl.Text = "Digite sua Key ou entre no modo Free"
+    StatusLbl.TextColor3 = Color3.fromRGB(185, 170, 155)
+    StatusLbl.Font = Enum.Font.Gotham
+    StatusLbl.TextSize = 10
+    StatusLbl.TextXAlignment = Enum.TextXAlignment.Left
 
-    local InfoLabel = Instance.new("TextLabel", LeftBox)
-    InfoLabel.Size, InfoLabel.Position = UDim2.new(1, -16, 0, 55), UDim2.fromOffset(8, 8)
-    InfoLabel.BackgroundTransparency = 1
-    InfoLabel.Text = "Information\nCreator: LCK SCRIPT\nVersion: BETA"
-    InfoLabel.TextColor3, InfoLabel.Font, InfoLabel.TextSize = Color3.fromRGB(240, 220, 200), Enum.Font.Gotham, 11
-    InfoLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-    local AvatarImg = Instance.new("ImageLabel", LeftBox)
-    AvatarImg.Size, AvatarImg.Position = UDim2.fromOffset(60, 60), UDim2.new(0.5, -30, 0, 90)
-    AvatarImg.BackgroundColor3 = Color3.fromRGB(45, 32, 25)
-    AvatarImg.Image = PlayerAvatarUrl
-    Instance.new("UICorner", AvatarImg).CornerRadius = UDim.new(1, 0)
-
-    local PlayerNameTag = Instance.new("TextLabel", LeftBox)
-    PlayerNameTag.Size, PlayerNameTag.Position = UDim2.new(1, -10, 0, 35), UDim2.fromOffset(5, 160)
-    PlayerNameTag.BackgroundTransparency = 1
-    PlayerNameTag.Text = LocalPlayer.Name .. "\n@" .. LocalPlayer.Name
-    PlayerNameTag.TextColor3, PlayerNameTag.Font, PlayerNameTag.TextSize = Color3.fromRGB(240, 230, 220), Enum.Font.GothamBold, 11
-    PlayerNameTag.TextXAlignment = Enum.TextXAlignment.Center
-
-    local RightBox = Instance.new("Frame", Card)
-    RightBox.Size, RightBox.Position = UDim2.fromOffset(260, 260), UDim2.fromOffset(243, 50)
-    RightBox.BackgroundColor3 = Color3.fromRGB(30, 22, 16)
-    Instance.new("UICorner", RightBox).CornerRadius = UDim.new(0, 8)
-    Instance.new("UIStroke", RightBox).Color = Color3.fromRGB(255, 140, 0)
-
-    local StatusLbl = Instance.new("TextLabel", RightBox)
-    StatusLbl.Size, StatusLbl.Position = UDim2.new(1, -16, 0, 32), UDim2.fromOffset(8, 20)
-    StatusLbl.BackgroundColor3 = Color3.fromRGB(40, 30, 22)
-    StatusLbl.Text, StatusLbl.TextColor3 = "Aguardando Autenticacao", Color3.fromRGB(255, 180, 0)
-    StatusLbl.Font, StatusLbl.TextSize = Enum.Font.GothamBold, 10
-    Instance.new("UICorner", StatusLbl).CornerRadius = UDim.new(0, 6)
-    Instance.new("UIStroke", StatusLbl).Color = Color3.fromRGB(255, 140, 0)
-
-    local KeyInputBg = Instance.new("Frame", RightBox)
-    KeyInputBg.Size, KeyInputBg.Position = UDim2.new(1, -16, 0, 35), UDim2.fromOffset(8, 65)
-    KeyInputBg.BackgroundColor3 = Color3.fromRGB(15, 10, 8)
-    Instance.new("UICorner", KeyInputBg).CornerRadius = UDim.new(0, 6)
-    Instance.new("UIStroke", KeyInputBg).Color = Color3.fromRGB(255, 140, 0)
-
-    local KeyInput = Instance.new("TextBox", KeyInputBg)
-    KeyInput.Size, KeyInput.Position = UDim2.new(1, -10, 1, 0), UDim2.fromOffset(5, 0)
-    KeyInput.BackgroundTransparency = 1
-    KeyInput.PlaceholderText, KeyInput.Text = "Digite sua Key aqui...", ""
-    KeyInput.TextColor3, KeyInput.PlaceholderColor3 = Color3.fromRGB(255, 255, 255), Color3.fromRGB(140, 110, 90)
-    KeyInput.Font, KeyInput.TextSize = Enum.Font.GothamMedium, 11
+    local KeyInput = Instance.new("TextBox", Card)
+    KeyInput.Size = UDim2.new(1, -24, 0, 36)
+    KeyInput.Position = UDim2.fromOffset(12, 66)
+    KeyInput.BackgroundColor3 = Color3.fromRGB(12, 9, 7)
+    KeyInput.PlaceholderText = "Cole ou digite sua Key aqui..."
+    KeyInput.Text = ""
+    KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+    KeyInput.PlaceholderColor3 = Color3.fromRGB(120, 105, 95)
+    KeyInput.Font = Enum.Font.GothamMedium
+    KeyInput.TextSize = 11
     KeyInput.ClearTextOnFocus = false
+    Instance.new("UICorner", KeyInput).CornerRadius = UDim.new(0, 6)
+    local kStroke = Instance.new("UIStroke", KeyInput)
+    kStroke.Color = Color3.fromRGB(70, 48, 34)
 
-    local BtnY, BtnH, BtnW, Gap = 140, 34, 80, 4
+    -- Menu simples para pegar link de Key
+    local LinkDrawer = Instance.new("Frame", Card)
+    LinkDrawer.Size = UDim2.new(1, -24, 0, 34)
+    LinkDrawer.Position = UDim2.fromOffset(12, 110)
+    LinkDrawer.BackgroundColor3 = Color3.fromRGB(24, 17, 13)
+    LinkDrawer.Visible = false
+    Instance.new("UICorner", LinkDrawer).CornerRadius = UDim.new(0, 6)
 
-    local FreeVersionBtn = Instance.new("TextButton", RightBox)
-    FreeVersionBtn.Size, FreeVersionBtn.Position = UDim2.fromOffset(BtnW, BtnH), UDim2.fromOffset(8, BtnY)
-    FreeVersionBtn.BackgroundColor3 = Color3.fromRGB(55, 40, 30)
-    FreeVersionBtn.Text, FreeVersionBtn.TextColor3 = "Free Version", Color3.fromRGB(240, 220, 200)
-    FreeVersionBtn.Font, FreeVersionBtn.TextSize = Enum.Font.GothamBold, 10
-    Instance.new("UICorner", FreeVersionBtn).CornerRadius = UDim.new(0, 6)
+    local LootBtn = Instance.new("TextButton", LinkDrawer)
+    LootBtn.Size = UDim2.new(0.48, -4, 1, -6)
+    LootBtn.Position = UDim2.fromOffset(4, 3)
+    LootBtn.BackgroundColor3 = Color3.fromRGB(45, 32, 24)
+    LootBtn.Text = "Copiar Lootlabs"
+    LootBtn.TextColor3 = Color3.fromRGB(255, 185, 95)
+    LootBtn.Font = Enum.Font.GothamBold
+    LootBtn.TextSize = 10
+    Instance.new("UICorner", LootBtn).CornerRadius = UDim.new(0, 5)
 
-    local GetKeyBtn = Instance.new("TextButton", RightBox)
-    GetKeyBtn.Size, GetKeyBtn.Position = UDim2.fromOffset(BtnW, BtnH), UDim2.fromOffset(8 + BtnW + Gap, BtnY)
-    GetKeyBtn.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
-    GetKeyBtn.Text, GetKeyBtn.TextColor3 = "Get Key", Color3.fromRGB(20, 14, 10)
-    GetKeyBtn.Font, GetKeyBtn.TextSize = Enum.Font.GothamBold, 10
-    Instance.new("UICorner", GetKeyBtn).CornerRadius = UDim.new(0, 6)
+    local LvBtn = Instance.new("TextButton", LinkDrawer)
+    LvBtn.Size = UDim2.new(0.48, -4, 1, -6)
+    LvBtn.Position = UDim2.new(0.5, 2, 0, 3)
+    LvBtn.BackgroundColor3 = Color3.fromRGB(45, 32, 24)
+    LvBtn.Text = "Copiar Linkvertise"
+    LvBtn.TextColor3 = Color3.fromRGB(255, 185, 95)
+    LvBtn.Font = Enum.Font.GothamBold
+    LvBtn.TextSize = 10
+    Instance.new("UICorner", LvBtn).CornerRadius = UDim.new(0, 5)
 
-    local EnterKeyBtn = Instance.new("TextButton", RightBox)
-    EnterKeyBtn.Size, EnterKeyBtn.Position = UDim2.fromOffset(BtnW, BtnH), UDim2.fromOffset(8 + (BtnW + Gap) * 2, BtnY)
-    EnterKeyBtn.BackgroundColor3 = Color3.fromRGB(180, 90, 0)
-    EnterKeyBtn.Text, EnterKeyBtn.TextColor3 = "Enter Key", Color3.fromRGB(255, 255, 255)
-    EnterKeyBtn.Font, EnterKeyBtn.TextSize = Enum.Font.GothamBold, 10
-    Instance.new("UICorner", EnterKeyBtn).CornerRadius = UDim.new(0, 6)
-
-    local panelOpen = false
-    local OptionPanel = Instance.new("Frame", RightBox)
-    OptionPanel.Size = UDim2.fromOffset(BtnW + 24, 58)
-    OptionPanel.Position = UDim2.fromOffset(8 + BtnW + Gap - 12, BtnY - 62)
-    OptionPanel.BackgroundColor3 = Color3.fromRGB(40, 30, 22)
-    OptionPanel.Visible = false
-    OptionPanel.ZIndex = 25
-    Instance.new("UICorner", OptionPanel).CornerRadius = UDim.new(0, 6)
-    Instance.new("UIStroke", OptionPanel).Color = Color3.fromRGB(255, 140, 0)
-
-    local function makeLinkOption(text, yPos, link)
-        local optBtn = Instance.new("TextButton", OptionPanel)
-        optBtn.Size, optBtn.Position = UDim2.new(1, -6, 0, 24), UDim2.fromOffset(3, yPos)
-        optBtn.BackgroundColor3 = Color3.fromRGB(60, 42, 30)
-        optBtn.Text, optBtn.TextColor3 = text, Color3.fromRGB(255, 200, 150)
-        optBtn.Font, optBtn.TextSize = Enum.Font.GothamBold, 9
-        optBtn.ZIndex = 26
-        Instance.new("UICorner", optBtn).CornerRadius = UDim.new(0, 4)
-        optBtn.MouseButton1Click:Connect(function()
-            pcall(function()
-                if typeof(setclipboard) == "function" then
-                    setclipboard(link)
-                end
-            end)
-            StatusLbl.Text, StatusLbl.TextColor3 = "Link Copiado!", Color3.fromRGB(105, 195, 255)
-            OptionPanel.Visible, panelOpen = false, false
+    local function copyLink(url, label)
+        pcall(function()
+            if typeof(setclipboard) == "function" then setclipboard(url) end
         end)
+        StatusLbl.Text = label .. " copiado!"
+        StatusLbl.TextColor3 = Color3.fromRGB(110, 210, 255)
+        LinkDrawer.Visible = false
     end
 
-    makeLinkOption("Option 1 (Lootlabs)", 3, API_CONFIG.KEY_LINKS.Lootlabs)
-    makeLinkOption("Option 2 (Linkvertise)", 30, API_CONFIG.KEY_LINKS.Linkvertise)
+    LootBtn.MouseButton1Click:Connect(function() copyLink(API_CONFIG.KEY_LINKS.Lootlabs, "Lootlabs") end)
+    LvBtn.MouseButton1Click:Connect(function() copyLink(API_CONFIG.KEY_LINKS.Linkvertise, "Linkvertise") end)
+
+    local FreeBtn = Instance.new("TextButton", Card)
+    FreeBtn.Size = UDim2.new(0.31, -4, 0, 34)
+    FreeBtn.Position = UDim2.fromOffset(12, 156)
+    FreeBtn.BackgroundColor3 = Color3.fromRGB(36, 26, 20)
+    FreeBtn.Text = "Free"
+    FreeBtn.TextColor3 = Color3.fromRGB(235, 225, 215)
+    FreeBtn.Font = Enum.Font.GothamBold
+    FreeBtn.TextSize = 11
+    Instance.new("UICorner", FreeBtn).CornerRadius = UDim.new(0, 6)
+
+    local GetKeyBtn = Instance.new("TextButton", Card)
+    GetKeyBtn.Size = UDim2.new(0.31, -4, 0, 34)
+    GetKeyBtn.Position = UDim2.new(0.345, 0, 0, 156)
+    GetKeyBtn.BackgroundColor3 = Color3.fromRGB(255, 136, 0)
+    GetKeyBtn.Text = "Pegar Key"
+    GetKeyBtn.TextColor3 = Color3.fromRGB(16, 12, 10)
+    GetKeyBtn.Font = Enum.Font.GothamBold
+    GetKeyBtn.TextSize = 11
+    Instance.new("UICorner", GetKeyBtn).CornerRadius = UDim.new(0, 6)
+
+    local EnterBtn = Instance.new("TextButton", Card)
+    EnterBtn.Size = UDim2.new(0.31, -4, 0, 34)
+    EnterBtn.Position = UDim2.new(0.675, 0, 0, 156)
+    EnterBtn.BackgroundColor3 = Color3.fromRGB(90, 235, 110)
+    EnterBtn.Text = "Entrar"
+    EnterBtn.TextColor3 = Color3.fromRGB(16, 12, 10)
+    EnterBtn.Font = Enum.Font.GothamBold
+    EnterBtn.TextSize = 11
+    Instance.new("UICorner", EnterBtn).CornerRadius = UDim.new(0, 6)
 
     GetKeyBtn.MouseButton1Click:Connect(function()
-        panelOpen = not panelOpen
-        OptionPanel.Visible = panelOpen
+        LinkDrawer.Visible = not LinkDrawer.Visible
+        Card.Size = LinkDrawer.Visible and UDim2.fromOffset(380, 246) or UDim2.fromOffset(380, 210)
     end)
 
-    FreeVersionBtn.MouseButton1Click:Connect(function()
-        StatusLbl.Text, StatusLbl.TextColor3 = "Free Version Ativa!", Color3.fromRGB(0, 255, 100)
-        task.wait(0.4)
+    FreeBtn.MouseButton1Click:Connect(function()
+        StatusLbl.Text = "Entrando no modo Free..."
+        StatusLbl.TextColor3 = Color3.fromRGB(90, 235, 110)
+        task.wait(0.25)
         SG:Destroy()
         LaunchSUSHub(false)
     end)
 
-    EnterKeyBtn.MouseButton1Click:Connect(function()
+    EnterBtn.MouseButton1Click:Connect(function()
         local entered = KeyInput.Text:gsub("%s+", "")
-        local isValid = false
-
-        for _, key in ipairs(API_CONFIG.VALID_KEYS) do
-            if entered == key then
-                isValid = true
-                break
-            end
+        local valid = false
+        for _, k in ipairs(API_CONFIG.VALID_KEYS) do
+            if entered == k then valid = true break end
         end
-
-        if isValid then
-            StatusLbl.Text, StatusLbl.TextColor3 = "Key Valida! Carregando...", Color3.fromRGB(0, 255, 100)
-            task.wait(0.5)
+        if valid then
+            StatusLbl.Text = "Key valida! Abrindo..."
+            StatusLbl.TextColor3 = Color3.fromRGB(90, 235, 110)
+            task.wait(0.3)
             SG:Destroy()
             LaunchSUSHub(true)
         else
-            StatusLbl.Text, StatusLbl.TextColor3 = "Key Invalida!", Color3.fromRGB(255, 80, 80)
+            StatusLbl.Text = "Key invalida."
+            StatusLbl.TextColor3 = Color3.fromRGB(255, 105, 105)
         end
     end)
 end
